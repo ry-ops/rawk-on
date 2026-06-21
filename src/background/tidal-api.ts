@@ -1,11 +1,17 @@
 import { TIDAL, DEBUG, dailyPlaylistName, localISODate } from '../shared/config.ts'
-import type { TrackInfo, AddTrackResult, SearchDebugResult } from '../shared/types.ts'
+import type {
+  TrackInfo,
+  AddTrackResult,
+  AddHourResult,
+  SearchDebugResult,
+} from '../shared/types.ts'
 import { getAccessToken } from './auth.ts'
 import {
   getDaily,
   setDaily,
   dropDaily,
   recordAddedTrack,
+  recordAddedTracks,
   type DailyPlaylist,
 } from './storage.ts'
 
@@ -33,9 +39,12 @@ class ApiError extends Error {
   }
 }
 
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
 async function api(
   path: string,
   init: RequestInit & { query?: Record<string, string> } = {},
+  attempt = 0,
 ): Promise<JsonApiDoc> {
   const token = await getAccessToken()
   if (!token) throw new NeedsAuthError('Not connected to TIDAL.')
@@ -55,6 +64,16 @@ async function api(
 
   const res = await fetch(url.toString(), { ...init, headers })
   if (DEBUG) console.log('[tidal-pool]', init.method ?? 'GET', url.pathname, res.status)
+
+  // Rate limited — wait (honoring Retry-After) and retry with backoff.
+  if (res.status === 429 && attempt < 5) {
+    const ra = Number(res.headers.get('Retry-After'))
+    const waitMs =
+      Number.isFinite(ra) && ra > 0 ? ra * 1000 : Math.min(8000, 400 * 2 ** attempt)
+    if (DEBUG) console.log(`[tidal-pool] 429 on ${url.pathname} — retry in ${waitMs}ms`)
+    await sleep(waitMs)
+    return api(path, init, attempt + 1)
+  }
 
   if (res.status === 401) throw new NeedsAuthError('TIDAL session expired.')
 
@@ -291,45 +310,70 @@ async function createDailyPlaylist(name: string): Promise<string> {
 }
 
 /**
- * Return today's playlist + local dedup set from storage, creating the playlist
- * only if we have none cached. No network round-trip when it's already cached —
+ * Return a playlist + local dedup set from storage under `cacheKey`, creating it
+ * with `name` only if none is cached. No network round-trip when cached —
  * staleness is handled lazily on add (see addWithRecreate).
  */
-async function ensureDailyPlaylist(isoDate: string): Promise<DailyPlaylist> {
-  const existing = await getDaily(isoDate)
+async function ensurePlaylist(cacheKey: string, name: string): Promise<DailyPlaylist> {
+  const existing = await getDaily(cacheKey)
   if (existing) return existing
-  const id = await createDailyPlaylist(dailyPlaylistName(isoDate))
-  await setDaily(isoDate, id, [])
+  const id = await createDailyPlaylist(name)
+  await setDaily(cacheKey, id, [])
   return { id, trackIds: [] }
 }
 
-async function addTrackToPlaylist(playlistId: string, trackId: string): Promise<void> {
-  await api(`/playlists/${playlistId}/relationships/items`, {
-    method: 'POST',
-    body: JSON.stringify({ data: [{ type: 'tracks', id: trackId }] }),
-  })
+/** POST one or more track ids to a playlist's items (chunked for safety). */
+async function addItems(playlistId: string, trackIds: string[]): Promise<void> {
+  for (let i = 0; i < trackIds.length; i += 20) {
+    const chunk = trackIds.slice(i, i + 20)
+    await api(`/playlists/${playlistId}/relationships/items`, {
+      method: 'POST',
+      body: JSON.stringify({ data: chunk.map((id) => ({ type: 'tracks', id })) }),
+    })
+  }
 }
 
-/** Add the track; if the cached playlist was deleted on TIDAL (404), recreate
- *  it once and retry. Returns the playlist id actually used. */
+/** Add ids; if the cached playlist was deleted on TIDAL (404), recreate it once
+ *  with `name` and retry. Returns the playlist id actually used. */
 async function addWithRecreate(
-  isoDate: string,
+  cacheKey: string,
+  name: string,
   daily: DailyPlaylist,
-  trackId: string,
+  trackIds: string[],
 ): Promise<string> {
   try {
-    await addTrackToPlaylist(daily.id, trackId)
+    await addItems(daily.id, trackIds)
     return daily.id
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) {
-      await dropDaily(isoDate)
-      const id = await createDailyPlaylist(dailyPlaylistName(isoDate))
-      await setDaily(isoDate, id, [])
-      await addTrackToPlaylist(id, trackId)
+      await dropDaily(cacheKey)
+      const id = await createDailyPlaylist(name)
+      await setDaily(cacheKey, id, [])
+      await addItems(id, trackIds)
       return id
     }
     throw err
   }
+}
+
+/** Run `fn` over items with a max concurrency. Order of results is preserved. */
+async function mapLimit<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length)
+  let next = 0
+  async function worker(): Promise<void> {
+    while (next < items.length) {
+      const i = next++
+      results[i] = await fn(items[i])
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, () => worker()),
+  )
+  return results
 }
 
 function playlistUrl(playlistId: string): string {
@@ -355,7 +399,7 @@ export async function addTrack(track: TrackInfo): Promise<AddTrackResult> {
     // Search and ensure-playlist are independent — run them concurrently.
     const [[match, msSearch], [daily, msEnsure]] = await Promise.all([
       timed(() => searchTrackId(track)),
-      timed(() => ensureDailyPlaylist(isoDate)),
+      timed(() => ensurePlaylist(isoDate, dailyPlaylistName(isoDate))),
     ])
 
     if (!match) {
@@ -378,7 +422,9 @@ export async function addTrack(track: TrackInfo): Promise<AddTrackResult> {
       }
     }
 
-    const [playlistId, msAdd] = await timed(() => addWithRecreate(isoDate, daily, trackId))
+    const [playlistId, msAdd] = await timed(() =>
+      addWithRecreate(isoDate, dailyPlaylistName(isoDate), daily, [trackId]),
+    )
     await recordAddedTrack(isoDate, trackId)
 
     const total = performance.now() - t0
@@ -391,6 +437,72 @@ export async function addTrack(track: TrackInfo): Promise<AddTrackResult> {
       matched: track,
       matchedTitle: match.title,
       ms: Math.round(total),
+    }
+  } catch (err) {
+    const needsAuth = err instanceof NeedsAuthError
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+      needsAuth,
+    }
+  }
+}
+
+/** Bulk-add every track from one hour block to its own dated playlist. */
+export async function addHour(
+  date: string,
+  hourLabel: string,
+  tracks: TrackInfo[],
+): Promise<AddHourResult> {
+  const t0 = performance.now()
+  try {
+    const cacheKey = `${date}·${hourLabel}`
+    const name = `The Current - ${date} · ${hourLabel}`
+    const daily = await ensurePlaylist(cacheKey, name)
+    const seen = new Set(daily.trackIds)
+
+    // Search tracks with low concurrency to respect the dev-tier rate limit;
+    // api() also backs off and retries on 429.
+    const matches = await mapLimit(tracks, 2, async (tr) => ({
+      tr,
+      id: (await searchTrackId(tr))?.id ?? null,
+    }))
+
+    const notFound: string[] = []
+    const toAdd: string[] = []
+    let duplicates = 0
+    for (const { tr, id } of matches) {
+      if (!id) {
+        notFound.push(`${tr.artist} – ${tr.title}`)
+      } else if (seen.has(id)) {
+        duplicates++
+      } else {
+        seen.add(id) // also dedup within this batch
+        toAdd.push(id)
+      }
+    }
+
+    if (toAdd.length) {
+      await addWithRecreate(cacheKey, name, daily, toAdd)
+      await recordAddedTracks(cacheKey, toAdd)
+    }
+
+    const ms = Math.round(performance.now() - t0)
+    if (DEBUG) {
+      console.log(
+        `[tidal-pool] hour "${hourLabel}" — added ${toAdd.length}, ` +
+          `dupes ${duplicates}, not found ${notFound.length}, ${ms}ms`,
+      )
+    }
+    return {
+      ok: true,
+      playlistId: daily.id,
+      playlistUrl: playlistUrl(daily.id),
+      added: toAdd.length,
+      duplicates,
+      notFound,
+      total: tracks.length,
+      ms,
     }
   } catch (err) {
     const needsAuth = err instanceof NeedsAuthError

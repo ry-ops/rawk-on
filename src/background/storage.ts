@@ -58,10 +58,20 @@ export async function recordAddedTrack(
   isoDate: string,
   trackId: string,
 ): Promise<void> {
+  await recordAddedTracks(isoDate, [trackId])
+}
+
+/** Append several track ids in a single read/write. */
+export async function recordAddedTracks(
+  key: string,
+  trackIds: string[],
+): Promise<void> {
   const map = await readMap()
-  const entry = map[isoDate]
+  const entry = map[key]
   if (!entry) return
-  if (!entry.trackIds.includes(trackId)) entry.trackIds.push(trackId)
+  for (const id of trackIds) {
+    if (!entry.trackIds.includes(id)) entry.trackIds.push(id)
+  }
   await writeMap(map)
 }
 

@@ -1,17 +1,27 @@
-import type { Message, AddTrackResult } from '../shared/types.ts'
-import { SELECTORS, pickAll } from './selectors.ts'
+import type { Message, AddTrackResult, AddHourResult, TrackInfo } from '../shared/types.ts'
+import { SELECTORS, pick, pickAll } from './selectors.ts'
 import { extractTrack } from './extract.ts'
 import {
   injectStyles,
   createAddButton,
   setButtonState,
+  createHourButton,
+  setHourButtonState,
   toast,
 } from './ui.ts'
+import { localISODate } from '../shared/config.ts'
 
 const MARK = 'tpWired' // dataset flag so we never double-wire a row
+const HOUR_MARK = 'tpHourWired'
 
 function send(msg: Message): Promise<AddTrackResult> {
   return chrome.runtime.sendMessage(msg) as Promise<AddTrackResult>
+}
+
+/** The date the playlist page is showing (from its date input), else today. */
+function pageDate(): string {
+  const input = document.querySelector<HTMLInputElement>('input[name="playlistDate"]')
+  return input?.value || localISODate(new Date())
 }
 
 /** True once the extension has been reloaded/updated out from under this page. */
@@ -98,6 +108,94 @@ function wireRow(row: HTMLElement): void {
 
 function scan(): void {
   for (const row of pickAll(document, SELECTORS.row)) wireRow(row)
+  for (const header of pickAll(document, SELECTORS.hourHeader)) wireHour(header)
+}
+
+// ── "Add hour" — bulk-add a whole hour block ────────────────────────────────
+
+function wireHour(header: HTMLElement): void {
+  if (header.dataset[HOUR_MARK]) return
+  // The hour's songs live in the <ul> right after the header.
+  const ul = header.nextElementSibling
+  if (!(ul instanceof HTMLElement) || ul.tagName !== 'UL') return
+  header.dataset[HOUR_MARK] = '1'
+  const label = (pick(header, SELECTORS.hourLabel)?.textContent ?? '').trim()
+  const btn = createHourButton((b) => void handleAddHour(ul, label, b))
+  header.appendChild(btn)
+}
+
+async function handleAddHour(
+  ul: HTMLElement,
+  hourLabel: string,
+  btn: HTMLButtonElement,
+): Promise<void> {
+  if (contextInvalidated()) {
+    setHourButtonState(btn, 'error', 'Reload page')
+    toast('Rawk On was updated — reload this page.', 'bad', 6000)
+    return
+  }
+  const tracks = pickAll(ul, SELECTORS.row)
+    .map(extractTrack)
+    .filter((t): t is TrackInfo => Boolean(t))
+  if (!tracks.length) {
+    setHourButtonState(btn, 'error', 'No songs')
+    toast('Couldn’t read any songs from this hour.', 'bad')
+    return
+  }
+
+  setHourButtonState(btn, 'loading', `Adding 0/${tracks.length}…`)
+  let res: AddHourResult
+  try {
+    res = (await chrome.runtime.sendMessage({
+      type: 'ADD_HOUR',
+      date: pageDate(),
+      hourLabel,
+      tracks,
+    })) as AddHourResult
+  } catch (err) {
+    setHourButtonState(btn, 'error', 'Retry')
+    const msg = err instanceof Error ? err.message : String(err)
+    toast(
+      /context invalidated/i.test(msg)
+        ? 'Rawk On was updated — reload this page.'
+        : `Couldn’t add hour: ${msg}`,
+      'bad',
+      6000,
+    )
+    return
+  }
+
+  if (!res.ok) {
+    setHourButtonState(btn, 'error', 'Retry')
+    toast(
+      res.needsAuth
+        ? 'Not connected to TIDAL. Open settings to log in.'
+        : `Couldn’t add hour: ${res.error}`,
+      'bad',
+      6000,
+    )
+    return
+  }
+
+  setHourButtonState(btn, 'done', `Added ${res.added}/${res.total}`)
+  const open = res.playlistUrl
+    ? ` · <a href="${res.playlistUrl}" target="_blank">open</a>`
+    : ''
+  const extras = [
+    res.duplicates ? `${res.duplicates} already there` : '',
+    res.notFound.length ? `${res.notFound.length} not found` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  toast(
+    `Added <strong>${res.added} of ${res.total}</strong> from ${hourLabel}` +
+      `${extras ? ` · ${extras}` : ''} · ${(res.ms / 1000).toFixed(1)}s${open}`,
+    res.added ? 'ok' : 'info',
+    6000,
+  )
+  if (res.notFound.length) {
+    console.log(`[tidal-pool] ${hourLabel} not found:`, res.notFound)
+  }
 }
 
 // Console helper for tuning selectors against the live DOM.

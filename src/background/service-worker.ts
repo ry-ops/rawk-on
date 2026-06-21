@@ -1,14 +1,20 @@
 import type {
   Message,
   AddTrackResult,
+  AddHourResult,
   AuthResult,
   RedirectUriResult,
   SearchDebugResult,
 } from '../shared/types.ts'
 import { login, logout, isConnected, redirectUri } from './auth.ts'
-import { addTrack, searchDebug } from './tidal-api.ts'
+import { addTrack, addHour, searchDebug } from './tidal-api.ts'
 
-type Response = AddTrackResult | AuthResult | RedirectUriResult | SearchDebugResult
+type Response =
+  | AddTrackResult
+  | AddHourResult
+  | AuthResult
+  | RedirectUriResult
+  | SearchDebugResult
 
 async function handle(msg: Message): Promise<Response> {
   switch (msg.type) {
@@ -35,11 +41,19 @@ async function handle(msg: Message): Promise<Response> {
 
     case 'SEARCH_DEBUG':
       return searchDebug(msg.query)
+
+    case 'ADD_HOUR':
+      return addHour(msg.date, msg.hourLabel, msg.tracks)
   }
 }
 
 chrome.runtime.onMessage.addListener((msg: Message, _sender, sendResponse) => {
-  handle(msg).then(sendResponse)
+  // Always respond — even on an unexpected throw — so the caller never hangs
+  // waiting for a reply that never comes.
+  handle(msg).then(sendResponse, (err: unknown) => {
+    console.error('[tidal-pool] handler error', err)
+    sendResponse({ ok: false, error: err instanceof Error ? err.message : String(err) })
+  })
   return true // keep the message channel open for the async response
 })
 

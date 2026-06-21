@@ -29,6 +29,7 @@ export type Message =
   | { type: 'LOGOUT' }
   | { type: 'GET_REDIRECT_URI' }
   | { type: 'SEARCH_DEBUG'; query: string }
+  | { type: 'ADD_HOUR'; date: string; hourLabel: string; tracks: TrackInfo[] }
 
 export interface SearchHit {
   rank: number
@@ -51,6 +52,19 @@ export type AddTrackResult =
       /** Title of the TIDAL track we actually matched (so mismatches show). */
       matchedTitle?: string
       /** End-to-end time for the add, in ms. */
+      ms: number
+    }
+  | { ok: false; error: string; needsAuth?: boolean }
+
+export type AddHourResult =
+  | {
+      ok: true
+      playlistId: string
+      playlistUrl?: string
+      added: number
+      duplicates: number
+      notFound: string[]
+      total: number
       ms: number
     }
   | { ok: false; error: string; needsAuth?: boolean }

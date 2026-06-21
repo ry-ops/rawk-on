@@ -25,6 +25,11 @@ export const SELECTORS = {
   // The per-song link, e.g. /song/the-current/86497 — the trailing number is
   // The Current's song_id (also present in the JSON API).
   songLink: ['a[href*="/song/"]'],
+  // Hour-block header. Direct child of .playlist-hours so it doesn't match the
+  // h4.playlist-title inside each card. Its next <ul> sibling holds the songs.
+  hourHeader: ['.playlist-hours > h4'],
+  // The "9 AM–10 AM" label inside an hour header.
+  hourLabel: ['cite', 'cite.type-hefty'],
 } as const
 
 /** First element matching any candidate selector, or null. */

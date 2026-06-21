@@ -31,14 +31,14 @@ const CSS = `
   transition: opacity .12s ease, transform .12s ease, background .12s ease;
   z-index: 5;
 }
-.tp-add-btn .tp-logo {
+.tp-logo {
   width: 28px;
   height: 28px;
   display: block;
   flex: 0 0 auto;
   filter: invert(1);          /* black line art → white on the dark pill */
 }
-.tp-add-btn .tp-label { white-space: nowrap; }
+.tp-label { white-space: nowrap; }
 .tp-row:hover .tp-add-btn,
 .tp-add-btn:focus-visible { opacity: 1; }
 .tp-add-btn:hover { transform: scale(1.05); }
@@ -46,6 +46,31 @@ const CSS = `
 .tp-add-btn.tp-done { background: #1db954; border-color: #1db954; }
 .tp-add-btn.tp-dupe { background: #6b7280; border-color: #6b7280; }
 .tp-add-btn.tp-err  { background: #dc2626; border-color: #dc2626; }
+
+/* Inline "Add hour" pill in each hour header — always visible. */
+.tp-hour-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 14px;
+  padding: 6px 14px 6px 7px;
+  font: 600 14px/1 system-ui, sans-serif;
+  color: #fff;
+  background: rgba(17,17,17,.92);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px;
+  box-shadow: 0 1px 5px rgba(0,0,0,.3);
+  cursor: pointer;
+  vertical-align: middle;
+  transition: filter .12s ease, background .12s ease;
+}
+.tp-hour-btn:hover { filter: brightness(1.12); }
+.tp-hour-btn[disabled] { cursor: default; }
+.tp-hour-btn .tp-logo { width: 24px; height: 24px; }
+.tp-hour-btn .tp-spin { width: 24px; height: 24px; }
+.tp-hour-btn.tp-done { background: #1db954; border-color: #1db954; }
+.tp-hour-btn.tp-err  { background: #dc2626; border-color: #dc2626; }
+
 @keyframes tp-spin { to { transform: rotate(360deg); } }
 .tp-spin {
   width: 28px; height: 28px;
@@ -147,6 +172,48 @@ export function setButtonState(
     default:
       btn.innerHTML = pill('Add')
       btn.title = 'Add to today’s TIDAL playlist'
+  }
+}
+
+// ── "Add hour" pill ───────────────────────────────────────────────────────────
+
+export function createHourButton(
+  onClick: (btn: HTMLButtonElement) => void,
+): HTMLButtonElement {
+  const btn = document.createElement('button')
+  btn.className = 'tp-hour-btn'
+  btn.type = 'button'
+  btn.title = 'Add this hour’s songs to a new TIDAL playlist'
+  btn.innerHTML = pill('Add hour')
+  btn.addEventListener('click', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onClick(btn)
+  })
+  return btn
+}
+
+export function setHourButtonState(
+  btn: HTMLButtonElement,
+  state: 'idle' | 'loading' | 'done' | 'error',
+  label?: string,
+): void {
+  btn.classList.remove('tp-done', 'tp-err')
+  btn.disabled = state === 'loading'
+  switch (state) {
+    case 'loading':
+      btn.innerHTML = pill(label ?? 'Adding…', { spinner: true })
+      break
+    case 'done':
+      btn.classList.add('tp-done')
+      btn.innerHTML = pill(label ?? 'Done ✓')
+      break
+    case 'error':
+      btn.classList.add('tp-err')
+      btn.innerHTML = pill(label ?? 'Retry')
+      break
+    default:
+      btn.innerHTML = pill('Add hour')
   }
 }
 
