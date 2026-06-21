@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tidal Pool — Settings</title>
+    <link rel="stylesheet" href="./options.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1>Tidal Pool</h1>
+      <p class="sub">Add songs from The Current to a daily TIDAL playlist.</p>
+
+      <section>
+        <h2>1 · TIDAL app credentials</h2>
+        <label>
+          Client ID
+          <input id="clientId" type="text" autocomplete="off" spellcheck="false"
+            placeholder="your TIDAL app client ID" />
+        </label>
+        <p class="note">
+          PKCE flow — no client secret needed. The client ID is public and is
+          the only credential. It’s stored in this install’s local storage,
+          never in the shipped extension.
+        </p>
+
+        <button id="saveCreds" class="btn">Save client ID</button>
+        <span id="savedMsg" class="msg"></span>
+      </section>
+
+      <section>
+        <h2>2 · Register this redirect URI (required)</h2>
+        <p class="sub">
+          <strong>Login will fail until you do this.</strong> Copy the URI below and
+          paste it into your app’s <strong>Redirect URIs</strong> at
+          <a href="https://developer.tidal.com/dashboard" target="_blank" rel="noopener">developer.tidal.com</a>,
+          then <strong>Save there</strong>. It must match exactly, including the trailing slash.
+        </p>
+        <div class="redirect">
+          <code id="redirectUri">…</code>
+          <button id="copyRedirect" class="btn btn-sm">Copy</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>3 · Connect</h2>
+        <div class="status">
+          <span id="statusDot" class="dot"></span>
+          <span id="statusText">Checking…</span>
+        </div>
+        <div class="row">
+          <button id="loginBtn" class="btn btn-primary">Log in to TIDAL</button>
+          <button id="logoutBtn" class="btn" hidden>Log out</button>
+        </div>
+        <p id="authError" class="msg msg-bad"></p>
+      </section>
+    </main>
+    <script type="module" src="./options.ts"></script>
+  </body>
+</html>

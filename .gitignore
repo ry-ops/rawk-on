@@ -1,0 +1,6 @@
+node_modules/
+dist/
+extension-private-key.pem
+*.log
+.DS_Store
+.vite/

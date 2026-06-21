@@ -1,0 +1,22 @@
+:root { color-scheme: light dark; }
+body { margin: 0; font: 13px/1.5 system-ui, sans-serif; background: #181b22; color: #e7e9ee; }
+.pop { width: 260px; padding: 14px 16px; }
+.head { display: flex; align-items: center; justify-content: space-between; }
+.head strong { font-size: 15px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #6b7280; }
+.dot.on { background: #1db954; }
+.dot.off { background: #dc2626; }
+.status { margin: 10px 0 4px; font-weight: 600; }
+.hint { margin: 4px 0 14px; color: #9aa1ad; }
+.hint a { color: #1db954; }
+.btn {
+  width: 100%;
+  padding: 9px 12px;
+  font: 600 13px/1 system-ui, sans-serif;
+  color: #042611;
+  background: #1db954;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.05); }
