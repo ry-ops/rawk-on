@@ -1,7 +1,7 @@
 # 🤘 Rawk On
 
 Add songs from [The Current](https://www.thecurrent.org/playlist/the-current)'s
-playlist to TIDAL — one track at a time, or a whole hour block at once.
+On-Air Playlist to TIDAL — one track at a time, or a whole hour block at once.
 
 ![Rawk On — add a track, or a whole hour](docs/demo.svg)
 
