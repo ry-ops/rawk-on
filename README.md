@@ -1,122 +1,112 @@
-# Tidal Pool
+# 🤘 Rawk On
 
-Hover a song on [The Current](https://www.thecurrent.org/playlist/the-current)'s
-playlist and add it to a daily TIDAL playlist (`The Current - YYYY-MM-DD`), with
-automatic find-or-create and de-duplication.
+Add songs from [The Current](https://www.thecurrent.org/playlist/the-current)'s
+playlist to TIDAL — one track at a time, or a whole hour block at once.
+
+![Rawk On — add a track, or a whole hour](docs/demo.svg)
+
+A Chrome (Manifest V3) extension: hover a song card for a 🤘 **Add** pill, or use
+**Add hour** in any hour header to bulk-capture that hour into its own playlist.
 
 Manifest V3 · TypeScript · Vite · [CRXJS](https://crxjs.dev) · TIDAL OAuth (PKCE).
 
-## How it works
+## What it does
 
-```
-Hover a song row  →  [➕ TIDAL] button  →  background worker:
-  search TIDAL for "artist title"
-  find-or-create today's playlist (cached by date)
-  skip if already present, else add
-  →  toast: "Added to TIDAL"
-```
+- **Add a track** — hover a card, click 🤘 **Add**. It searches TIDAL, matches on
+  **title + artist + album**, and files the song in a daily playlist
+  (`The Current - YYYY-MM-DD`), de-duped.
+- **Add an hour** — click **Add hour** on a block (e.g. `9 AM–10 AM`) to bulk-add
+  every song to its own playlist (`The Current - <date> · 9 AM–10 AM`).
+- **Right song, not just the popular one** — candidates are scored on title +
+  artist + album; if nothing matches the title, it adds *nothing* rather than the
+  wrong track.
+- **Resilient** — backs off and retries on TIDAL's rate limit (HTTP 429).
 
-- **No client secret.** Auth is Authorization Code + PKCE, the public-client
-  flow. The only credential is the **client ID**, which is public by design.
+## Privacy / security
+
+- **No client secret.** Auth is Authorization Code + PKCE (the public-client flow).
+  The only credential is the **client ID**, which is public by design.
 - **Nothing sensitive in the bundle.** The client ID is entered at runtime and
-  stored in `chrome.storage.local`; OAuth tokens live there too (same risk
-  profile as a logged-in session cookie). The shipped extension contains no
-  secrets.
+  kept in `chrome.storage.local`; OAuth tokens live there too (same risk profile
+  as a logged-in session cookie). The shipped extension contains no secrets.
 
 ## Prerequisites
 
 - Node 20+ and npm
 - A TIDAL developer application — https://developer.tidal.com
 
-## Build
+## Build & load
 
 ```bash
 npm install
-npm run build      # type-checks, then emits dist/
-npm run dev        # optional: HMR dev server
+npm run build        # type-checks, then emits dist/
 ```
 
-## Load it in Chrome
+1. Go to `chrome://extensions`, enable **Developer mode**.
+2. **Load unpacked** → select the `dist/` folder.
 
-1. `npm run build`
-2. Go to `chrome://extensions`, enable **Developer mode**.
-3. **Load unpacked** → select the `dist/` folder.
-4. Note the extension ID Chrome assigns (stays constant while the unpacked
-   folder path is constant).
+(`npm run dev` runs an HMR dev server if you're iterating.)
 
 ## Connect TIDAL (one-time)
 
-1. Click the extension icon → **Settings & login** (opens the options page).
-2. **Copy the Redirect URI** shown there. It looks like:
-   `https://<extension-id>.chromiumapp.org/`
-3. In the [TIDAL developer portal](https://developer.tidal.com), open your app
-   and add that exact URI to its **allowed redirect URIs**. TIDAL requires
-   redirect URIs to be HTTPS, non-localhost, no query params — the Chrome URI
-   satisfies all three.
-4. Back on the options page, paste your **Client ID** (a default is pre-filled)
-   and **Save**.
-5. Click **Log in to TIDAL**, approve the consent screen. The status dot turns
-   green.
+1. Click the extension icon → **Settings & login**.
+2. **Copy the Redirect URI** shown (e.g. `https://<extension-id>.chromiumapp.org/`).
+3. In the [TIDAL developer portal](https://developer.tidal.com), open your app and
+   add that exact URI to its **Redirect URIs**, then **Save** — login fails until
+   you do this. (TIDAL requires HTTPS, non-localhost, no query params; the Chrome
+   URI satisfies all three.)
+4. Back in Settings, confirm the **Client ID**, **Save**, then **Log in to TIDAL**.
+
+A `key` is pinned in `manifest.config.ts`, so the extension ID — and thus the
+redirect URI — stays constant across reloads and machines.
+
+> The account you log in with at the consent screen is the one whose playlists get
+> created — sign in with your **listening** account, not (necessarily) the
+> developer account that owns the app.
 
 ## Use it
 
-Open a playlist, e.g. https://www.thecurrent.org/playlist/the-current, hover a
-song, and click **➕ TIDAL**. A toast confirms the add (or tells you it was
-already in today's playlist).
+Open <https://www.thecurrent.org/playlist/the-current>:
+- Hover a card → 🤘 **Add** (the toast shows the matched title + time).
+- Click **Add hour** in any hour header → the whole hour lands in its own playlist.
 
-## Tuning the playlist selectors
+## Debugging
 
-The Current renders its playlist with JavaScript, so the exact CSS class names
-can change. If the **➕** button doesn't appear, or it can't read a song:
+`DEBUG = true` in `src/shared/config.ts` logs every request in the service-worker
+console (`chrome://extensions` → Rawk On → **service worker**).
 
-1. Open a playlist page, open DevTools console.
-2. Run `__tidalPoolSelfTest()`. It reports how many rows matched and what
-   title/artist it extracted from the first few.
-3. Edit `src/content/selectors.ts` → `SELECTORS.row` / `.title` / `.artist`
-   with the real selectors (inspect a row in DevTools to find them).
-4. `npm run build`, then reload the extension at `chrome://extensions`.
+- `await rawkSearch('artist title')` — in the **service-worker** console, prints
+  TIDAL's ranked results for a query (rank, title, artists, album).
+- `__tidalPoolSelfTest()` — in the **page** console, checks the DOM selectors.
 
-## Things that may need a live smoke test
-
-These could not be verified without an approved TIDAL app + live login. All are
-isolated in one or two files, and `DEBUG = true` in `src/shared/config.ts` logs
-every request/response in the service-worker console (`chrome://extensions` →
-the extension → **service worker**):
-
-- **OAuth endpoints** — `authorizeUrl` / `tokenUrl` in `src/shared/config.ts`.
-- **Scope names** — `scopes` in `src/shared/config.ts`. If consent rejects one,
-  trim the list. (Older TIDAL apps used `r_usr w_usr`.)
-- **API request/response shapes** — search, create-playlist, list-items, and
-  add-items in `src/background/tidal-api.ts` follow TIDAL's Open API v2 JSON:API
-  style. Adjust field paths there if the live responses differ.
+If the page DOM changes and buttons stop appearing, the selectors live in one
+place: `src/content/selectors.ts`.
 
 ## Project layout
 
 ```
-manifest.config.ts          MV3 manifest (CRXJS)
+manifest.config.ts          MV3 manifest (CRXJS) — pinned key, icons
+docs/demo.svg               animated README demo
 src/
   shared/
     config.ts               endpoints, scopes, DEBUG, playlist naming
     settings.ts             client ID in chrome.storage.local
     types.ts                shared types + message protocol
   background/
-    service-worker.ts       message router
+    service-worker.ts       message router (always responds)
     auth.ts                 PKCE login / refresh / logout
-    tidal-api.ts            search · find-or-create · dedup · add
-    storage.ts              tokens + per-day playlist-id cache
+    tidal-api.ts            search · title+artist+album match · add · addHour · 429 backoff
+    storage.ts              tokens + per-day/-hour playlist cache & dedup
   content/
-    main.ts                 observe rows, inject button, toast
-    selectors.ts            ⭐ tune these against the live DOM
-    extract.ts              row → { title, artist }
-    ui.ts                   hover button + toast styles
+    main.ts                 wire cards + hour headers, toasts
+    selectors.ts            ⭐ DOM selectors (tune here if the page changes)
+    extract.ts              card → { title, artist, album, songId }
+    ui.ts                   Add pill, Add-hour pill, toasts
   options/                  settings + login hub
   popup/                    quick status + open settings
 ```
 
-## Publishing later (optional)
+## Credits
 
-For a stable extension ID (and thus a stable redirect URI) across machines, add
-a `key` to `manifest.config.ts`. Generate one per the
-[Chrome docs](https://developer.chrome.com/docs/extensions/reference/manifest/key-permissions),
-register the resulting `chromiumapp.org` redirect URI in TIDAL, and rebuild.
-```
+Metal-hand icon: [Noun Project #1200426](https://thenounproject.com/icon/metal-hand-1200426/)
+(CC BY) — add creator attribution if you distribute publicly.

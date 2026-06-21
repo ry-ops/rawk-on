@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 470" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  <defs>
+    <filter id="whiten"><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"/></filter>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34c77b"/><stop offset="1" stop-color="#0c7a43"/></linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#3b2db0"/></linearGradient>
+    <style>
+      .lbl{font-weight:600;font-size:14px;fill:#fff}
+      .pill{fill:#18181b}
+      text{dominant-baseline:auto}
+      .ripple,.spin,.toast{transform-box:fill-box;transform-origin:center}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      /* ---- track (panel A) ---- */
+      @keyframes aAdd   {0%,12%{opacity:1}14%,50%{opacity:0}52%,100%{opacity:1}}
+      @keyframes aAdding{0%,13%{opacity:0}15%,25%{opacity:1}27%,100%{opacity:0}}
+      @keyframes aDone  {0%,27%{opacity:0}29%,49%{opacity:1}51%,100%{opacity:0}}
+      @keyframes aBg    {0%,27%{fill:#18181b}29%,50%{fill:#1db954}52%,100%{fill:#18181b}}
+      @keyframes aRip   {0%,11%{opacity:0;transform:scale(.3)}12%{opacity:.4;transform:scale(.3)}18%{opacity:0;transform:scale(1.8)}100%{opacity:0}}
+      @keyframes aToast {0%,28%{opacity:0;transform:translateY(10px)}32%,48%{opacity:1;transform:translateY(0)}51%,100%{opacity:0;transform:translateY(10px)}}
+      /* ---- hour (panel B), offset later in the loop ---- */
+      @keyframes bAdd   {0%,60%{opacity:1}62%,95%{opacity:0}97%,100%{opacity:1}}
+      @keyframes bAdding{0%,61%{opacity:0}63%,75%{opacity:1}77%,100%{opacity:0}}
+      @keyframes bDone  {0%,77%{opacity:0}79%,95%{opacity:1}97%,100%{opacity:0}}
+      @keyframes bBg    {0%,77%{fill:#18181b}79%,95%{fill:#1db954}97%,100%{fill:#18181b}}
+      @keyframes bRip   {0%,59%{opacity:0;transform:scale(.3)}60%{opacity:.4;transform:scale(.3)}66%{opacity:0;transform:scale(1.8)}100%{opacity:0}}
+      @keyframes bToast {0%,78%{opacity:0;transform:translateY(10px)}82%,94%{opacity:1;transform:translateY(0)}97%,100%{opacity:0;transform:translateY(10px)}}
+      .aAdd{animation:aAdd 11s infinite} .aAdding{animation:aAdding 11s infinite} .aDone{animation:aDone 11s infinite}
+      .aBg{animation:aBg 11s infinite} .aRip{animation:aRip 11s infinite} .aToast{animation:aToast 11s infinite}
+      .bAdd{animation:bAdd 11s infinite} .bAdding{animation:bAdding 11s infinite} .bDone{animation:bDone 11s infinite}
+      .bBg{animation:bBg 11s infinite} .bRip{animation:bRip 11s infinite} .bToast{animation:bToast 11s infinite}
+      .sp{animation:spin 0.8s linear infinite}
+    </style>
+  </defs>
+
+  <rect width="820" height="470" rx="18" fill="#f4f4f5"/>
+  <text x="410" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="#18181b">🤘 Rawk On — add a track, or a whole hour</text>
+  <text x="210" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#71717a" letter-spacing="1.5">ONE TRACK</text>
+  <text x="610" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#71717a" letter-spacing="1.5">A WHOLE HOUR</text>
+
+  <!-- ===== Panel A: single track card ===== -->
+  <g>
+    <rect x="40" y="76" width="330" height="300" rx="14" fill="#fff" stroke="#e4e4e7"/>
+    <rect x="58" y="92" width="294" height="150" rx="8" fill="url(#g1)"/>
+    <text x="58" y="272" font-size="17" font-weight="700" fill="#18181b">Float On</text>
+    <text x="58" y="294" font-size="14" fill="#3f3f46">Modest Mouse</text>
+    <text x="58" y="313" font-size="12" fill="#a1a1aa">Good News for People Who Love Bad News</text>
+    <text x="58" y="338" font-size="12" fill="#a1a1aa">10:01 am</text>
+
+    <!-- click ripple -->
+    <circle class="aRip" cx="300" cy="113" r="26" fill="#18181b"/>
+    <!-- pill -->
+    <g>
+      <rect class="pill aBg" x="246" y="96" width="108" height="34" rx="17"/>
+      <g class="aAdd">
+        <image href="data:image/png;base64,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" x="254" y="104" width="20" height="20" filter="url(#whiten)"/>
+        <text x="282" y="118" class="lbl">Add</text>
+      </g>
+      <g class="aAdding">
+        <circle class="sp" cx="264" cy="113" r="8" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="13 40" stroke-linecap="round"/>
+        <text x="280" y="118" class="lbl">Adding…</text>
+      </g>
+      <g class="aDone">
+        <text x="258" y="118" class="lbl">✓</text>
+        <text x="272" y="118" class="lbl">Added</text>
+      </g>
+    </g>
+
+    <!-- toast -->
+    <g class="aToast">
+      <rect x="58" y="392" width="294" height="40" rx="10" fill="#1db954"/>
+      <text x="74" y="417" font-size="13" font-weight="600" fill="#fff">Added Float On · 0.7s</text>
+    </g>
+  </g>
+
+  <!-- ===== Panel B: hour block ===== -->
+  <g>
+    <rect x="440" y="76" width="330" height="300" rx="14" fill="#fff" stroke="#e4e4e7"/>
+    <text x="458" y="116" font-size="20" font-weight="800" fill="#18181b">9 AM–10 AM</text>
+
+    <!-- mini song rows -->
+    <g font-size="12">
+      <rect x="458" y="140" width="30" height="30" rx="5" fill="url(#g2)"/><text x="498" y="153" font-weight="600" fill="#27272a">Dry Spell</text><text x="498" y="167" fill="#a1a1aa">Kacey Musgraves</text>
+      <rect x="458" y="178" width="30" height="30" rx="5" fill="url(#g1)"/><text x="498" y="191" font-weight="600" fill="#27272a">Palm Readers</text><text x="498" y="205" fill="#a1a1aa">Palmyra</text>
+      <rect x="458" y="216" width="30" height="30" rx="5" fill="url(#g2)"/><text x="498" y="229" font-weight="600" fill="#27272a">I Don't Understand</text><text x="498" y="243" fill="#a1a1aa">MT Jones</text>
+      <rect x="458" y="254" width="30" height="30" rx="5" fill="url(#g1)"/><text x="498" y="267" font-weight="600" fill="#27272a">My Dad</text><text x="498" y="281" fill="#a1a1aa">Paul Westerberg</text>
+      <text x="458" y="312" fill="#a1a1aa">+ 10 more…</text>
+    </g>
+
+    <!-- click ripple -->
+    <circle class="bRip" cx="690" cy="103" r="30" fill="#18181b"/>
+    <!-- Add hour pill -->
+    <g>
+      <rect class="pill bBg" x="604" y="86" width="150" height="34" rx="17"/>
+      <g class="bAdd">
+        <image href="data:image/png;base64,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" x="612" y="94" width="20" height="20" filter="url(#whiten)"/>
+        <text x="640" y="108" class="lbl">Add hour</text>
+      </g>
+      <g class="bAdding">
+        <circle class="sp" cx="622" cy="103" r="8" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="13 40" stroke-linecap="round"/>
+        <text x="638" y="108" class="lbl">Adding…</text>
+      </g>
+      <g class="bDone">
+        <text x="616" y="108" class="lbl">✓</text>
+        <text x="630" y="108" class="lbl">Added 12/14</text>
+      </g>
+    </g>
+
+    <!-- toast -->
+    <g class="bToast">
+      <rect x="458" y="392" width="294" height="40" rx="10" fill="#1db954"/>
+      <text x="474" y="417" font-size="13" font-weight="600" fill="#fff">Added 12 of 14 from 9 AM–10 AM</text>
+    </g>
+  </g>
+</svg>
