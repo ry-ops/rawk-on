@@ -13,9 +13,10 @@ settingsBtn.addEventListener('click', () => chrome.runtime.openOptionsPage())
 async function init(): Promise<void> {
   const res = await send<AuthResult>({ type: 'GET_AUTH_STATE' })
   const connected = res.ok && res.state.connected
+  const providerLabel = res.ok && res.state.provider === 'spotify' ? 'Spotify' : 'TIDAL'
   dot.classList.toggle('on', connected)
   dot.classList.toggle('off', !connected)
-  status.textContent = connected ? 'Connected to TIDAL' : 'Not connected'
+  status.textContent = connected ? `Connected to ${providerLabel}` : `Not connected to ${providerLabel}`
 }
 
 void init()

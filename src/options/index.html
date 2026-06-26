@@ -9,32 +9,35 @@
   <body>
     <main class="card">
       <h1>🤘 Rawk On</h1>
-      <p class="sub">Add songs from The Current’s On-Air Playlist to TIDAL.</p>
+      <p class="sub">Add songs from The Current's On-Air Playlist to your music library.</p>
 
       <section>
-        <h2>1 · TIDAL app credentials</h2>
+        <h2>1 · Music service</h2>
+        <div class="provider-tabs">
+          <button id="providerTidal" class="tab" data-provider="tidal">TIDAL</button>
+          <button id="providerSpotify" class="tab" data-provider="spotify">Spotify</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>2 · App credentials</h2>
         <label>
           Client ID
           <input id="clientId" type="text" autocomplete="off" spellcheck="false"
-            placeholder="your TIDAL app client ID" />
+            placeholder="your app client ID" />
         </label>
-        <p class="note">
-          PKCE flow — no client secret needed. The client ID is public and is
-          the only credential. It’s stored in this install’s local storage,
-          never in the shipped extension.
-        </p>
-
+        <p class="note" id="credNote"></p>
         <button id="saveCreds" class="btn">Save client ID</button>
         <span id="savedMsg" class="msg"></span>
       </section>
 
       <section>
-        <h2>2 · Register this redirect URI (required)</h2>
+        <h2>3 · Register this redirect URI (required)</h2>
         <p class="sub">
           <strong>Login will fail until you do this.</strong> Copy the URI below and
-          paste it into your app’s <strong>Redirect URIs</strong> at
-          <a href="https://developer.tidal.com/dashboard" target="_blank" rel="noopener">developer.tidal.com</a>,
-          then <strong>Save there</strong>. It must match exactly, including the trailing slash.
+          paste it into your app's <strong>Redirect URIs</strong> at
+          <a id="portalLink" href="#" target="_blank" rel="noopener">the developer portal</a>,
+          then <strong>Save there</strong>.
         </p>
         <div class="redirect">
           <code id="redirectUri">…</code>
@@ -43,13 +46,13 @@
       </section>
 
       <section>
-        <h2>3 · Connect</h2>
+        <h2>4 · Connect</h2>
         <div class="status">
           <span id="statusDot" class="dot"></span>
           <span id="statusText">Checking…</span>
         </div>
         <div class="row">
-          <button id="loginBtn" class="btn btn-primary">Log in to TIDAL</button>
+          <button id="loginBtn" class="btn btn-primary">Log in</button>
           <button id="logoutBtn" class="btn" hidden>Log out</button>
         </div>
         <p id="authError" class="msg msg-bad"></p>

@@ -11,17 +11,12 @@
 export const TIDAL = {
   clientId: '0xURt22Z3puWuGDZ',
 
-  // OAuth endpoints. Verify against developer.tidal.com if auth fails.
   authorizeUrl: 'https://login.tidal.com/authorize',
   tokenUrl: 'https://auth.tidal.com/v1/oauth2/token',
 
-  // API base (TIDAL Open API v2, JSON:API style).
   apiBase: 'https://openapi.tidal.com/v2',
   countryCode: 'US',
 
-  // Scopes for reading the user and writing playlists. If the consent screen
-  // rejects a scope, trim this list to what your app is approved for. Older
-  // TIDAL apps used `r_usr w_usr` instead — swap if needed.
   scopes: [
     'user.read',
     'collection.read',
@@ -29,6 +24,21 @@ export const TIDAL = {
     'playlists.read',
     'playlists.write',
     'search.read',
+  ],
+} as const
+
+export const SPOTIFY = {
+  // Register a Spotify app at developer.spotify.com (PKCE, no client secret).
+  clientId: '',
+
+  authorizeUrl: 'https://accounts.spotify.com/authorize',
+  tokenUrl: 'https://accounts.spotify.com/api/token',
+
+  apiBase: 'https://api.spotify.com/v1',
+
+  scopes: [
+    'playlist-modify-private',
+    'playlist-modify-public',
   ],
 } as const
 

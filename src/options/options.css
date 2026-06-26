@@ -71,5 +71,17 @@ input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: #6b7280; }
 .dot.on { background: var(--accent); }
 .dot.off { background: #dc2626; }
+.provider-tabs { display: flex; gap: 6px; }
+.tab {
+  padding: 8px 18px;
+  font: 600 13px/1 system-ui, sans-serif;
+  color: var(--sub);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.tab:hover { color: var(--fg); border-color: var(--sub); }
+.tab-active { color: var(--fg); border-color: var(--accent); background: #0d2318; }
 .msg { margin-left: 10px; font-size: 12px; color: var(--accent); }
 .msg-bad { display: block; margin: 10px 0 0; color: #f87171; }
