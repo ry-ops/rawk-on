@@ -53,5 +53,7 @@ export default defineManifest({
     'https://openapi.tidal.com/*',
     'https://auth.tidal.com/*',
     'https://login.tidal.com/*',
+    'https://api.spotify.com/*',
+    'https://accounts.spotify.com/*',
   ],
 })

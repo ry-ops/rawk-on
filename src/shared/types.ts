@@ -12,10 +12,13 @@ export interface Tokens {
   refreshToken: string
   /** Epoch ms when the access token expires. */
   expiresAt: number
+  /** Spotify only: the authenticated user's Spotify ID, needed to create playlists. */
+  userId?: string
 }
 
 export interface AuthState {
   connected: boolean
+  provider?: 'tidal' | 'spotify'
   /** Display name / id of the connected user, if known. */
   user?: string
 }
