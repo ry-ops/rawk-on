@@ -1,8 +1,7 @@
-# Tidal Pool — local setup
+# Rawk On — local setup
 
 Run these from the project folder:
 
-    cd /Users/ryandahlberg/Projects/tidal-pool
     npm install
     npm run build
 

@@ -35,7 +35,7 @@ export const TIDAL = {
 // Flip on to log every TIDAL request/response in the service worker console.
 // Invaluable for the first live smoke test — the response shapes below are the
 // most likely thing to need adjusting.
-export const DEBUG = true
+export const DEBUG = false
 
 // Playlist naming: "The Current - 2026-06-21"
 export function dailyPlaylistName(isoDate: string): string {
