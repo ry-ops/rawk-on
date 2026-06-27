@@ -25,8 +25,9 @@ friction is high, so **clear per-provider setup docs are essential** (Phase 1).
       **CC BY**. Decision: attribute (no purchase). Attribution string:
       **"Metal Hand by Berkah Icon from the Noun Project."** Added to README credits;
       must also appear in each store listing description (see Phase 2).
-- [ ] **Host the privacy policy** — `public/privacy.html` needs a public URL
-      (Cloudflare Pages is a good fit). Both stores require a privacy policy link.
+- [~] **Privacy policy** — `public/privacy.html` is **written and current** (covers
+      TIDAL + Spotify, brand-themed). Still needs a **public URL** to link from both
+      stores — host it (GitHub Pages from `public/`, or Cloudflare Pages).
 - [ ] **Screenshots / promo art** — at least one 1280×800 or 640×400; a 440×280
       promo tile for CWS helps. None exist yet (`docs/demo.svg` is README-only).
 - [ ] **Version** — bump `0.1.0` → `1.0.0` for first release (manifest + package.json).
