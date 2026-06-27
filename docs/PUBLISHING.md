@@ -21,9 +21,10 @@ friction is high, so **clear per-provider setup docs are essential** (Phase 1).
       synced `package.json`).
 - [x] **Clean stale comment** in `manifest.config.ts` (removed the contradictory
       "No key is pinned" block).
-- [ ] **Icon licensing** — metal-hand is Noun Project #1200426 (**CC BY**). Either
-      attribute the creator in every store listing, buy a Noun Project license, or
-      commission/replace the icon. Required before public distribution.
+- [x] **Icon licensing** — Noun Project #1200426 "Metal Hand" by **Berkah Icon**,
+      **CC BY**. Decision: attribute (no purchase). Attribution string:
+      **"Metal Hand by Berkah Icon from the Noun Project."** Added to README credits;
+      must also appear in each store listing description (see Phase 2).
 - [ ] **Host the privacy policy** — `public/privacy.html` needs a public URL
       (Cloudflare Pages is a good fit). Both stores require a privacy policy link.
 - [ ] **Screenshots / promo art** — at least one 1280×800 or 640×400; a 440×280
@@ -46,6 +47,7 @@ Write step-by-step guides; link from README **and** the extension's Settings pag
 - [ ] Register a CWS developer account (one-time **$5**).
 - [ ] Build + zip `dist/` (`npm run build`).
 - [ ] Listing: name, detailed description, category, language, screenshots, promo tile.
+- [ ] **Icon attribution in the listing description (required):** `Metal Hand by Berkah Icon from the Noun Project.`
 - [ ] **Privacy practices form:** stores OAuth tokens + client IDs in
       `chrome.storage.local`; **no remote servers**; no data sale. Justify each
       permission: `storage`, `identity`, and the 6 host permissions

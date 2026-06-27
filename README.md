@@ -144,11 +144,12 @@ src/
 To publish:
 1. Host `public/privacy.html` somewhere and add the URL to your CWS listing.
 2. Add at least one 1280×800 or 640×400 screenshot to the listing.
-3. For the icon: the metal-hand icon is CC BY (Noun Project #1200426) — attribute
-   the creator in your listing description, or purchase a Noun Project license.
+3. Icon attribution (required): include **"Metal Hand by Berkah Icon from the Noun
+   Project"** (Noun Project #1200426, CC BY) in the listing description.
 4. Zip the `dist/` folder and upload to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).
 
 ## Credits
 
-Metal-hand icon: [Noun Project #1200426](https://thenounproject.com/icon/metal-hand-1200426/)
-(CC BY) — add creator attribution if you distribute publicly.
+**Metal Hand** icon by **Berkah Icon** from the
+[Noun Project](https://thenounproject.com/icon/metal-hand-1200426/) (#1200426, CC BY).
+The same attribution is included in the Chrome Web Store listing.
