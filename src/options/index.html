@@ -57,6 +57,18 @@
         </div>
         <p id="authError" class="msg msg-bad"></p>
       </section>
+
+      <section>
+        <h2>5 · Maintenance</h2>
+        <p class="note">
+          Clears this service's cached daily-playlist references. Handy if a daily
+          playlist was deleted on the service. Your login isn't affected, and each
+          service's cache is separate.
+        </p>
+        <button id="clearCacheBtn" class="btn">Clear cached playlists</button>
+        <span class="tip" tabindex="0" role="note" aria-label="How to verify the clear button">?<span class="tip-body"><strong>Verify it works:</strong> click once, then click again to confirm — you'll see <strong>“Cleared N ✓”</strong> (N = entries removed). Add a song afterward and a fresh daily playlist is created for this service. Your login, and the other service's cache, stay untouched.</span></span>
+        <span id="clearMsg" class="msg"></span>
+      </section>
     </main>
     <script type="module" src="./options.ts"></script>
   </body>
