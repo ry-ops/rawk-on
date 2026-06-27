@@ -29,7 +29,7 @@ friction is high, so **clear per-provider setup docs are essential** (Phase 1).
       TIDAL + Spotify, brand-themed). Still needs a **public URL** to link from both
       stores — host it (GitHub Pages from `public/`, or Cloudflare Pages).
 - [ ] **Screenshots / promo art** — at least one 1280×800 or 640×400; a 440×280
-      promo tile for CWS helps. None exist yet (`docs/demo.svg` is README-only).
+      promo tile for CWS helps. None exist yet (`docs/demo-vinyl.svg` is README-only).
 - [ ] **Version** — bump `0.1.0` → `1.0.0` for first release (manifest + package.json).
 
 ## Phase 1 — User-facing provider setup docs (essential for Model A)
