@@ -23,7 +23,7 @@ Rawk On
 
 **Summary** (short description, ≤132 chars)
 ```
-Hover a song on The Current's playlist and add it to a daily TIDAL or Spotify playlist — one track, or a whole hour.
+Catch songs from The Current and save them to a daily TIDAL or Spotify playlist — one click per track, or a whole hour.
 ```
 
 **Category**
@@ -38,29 +38,42 @@ English (United States)
 
 **Detailed description**
 ```
-Rawk On turns The Current's on-air playlist into your daily playlist on TIDAL or Spotify.
+That song The Current just played? The one you meant to remember? Rawk On catches it
+before the next track buries it.
 
-Open a Current playlist page (thecurrent.org), hover any song, and a 🤘 "Add" pill
-appears — one click drops that track into a dated playlist on the service you've
-connected. Want the whole hour? Each hour block gets an "Add hour" button that adds
-every song at once, skipping anything already there.
+Rawk On adds a little 🤘 to The Current's online playlist. Hover any song on
+thecurrent.org and an "Add" pill appears — one click files it into a playlist on your
+own TIDAL or Spotify, stamped with today's date. Hear a whole hour worth keeping? Tap
+"Add hour" and the entire block lands at once, with anything you already saved quietly
+skipped.
 
-FEATURES
-• Add one track, or a whole hour block, in a click.
-• Works with TIDAL or Spotify — switch anytime, no re-login.
-• Daily playlists, named by date, so each day's listening stays its own.
-• Smart matching with a clear toast showing exactly what landed (and the time).
-• Duplicate-aware: a song already in today's playlist won't be added twice.
+Every day gets its own playlist, so Tuesday afternoon's deep cuts never blur into
+Friday night's. And because it names tracks by what actually landed — with a quick toast
+confirming the match — you're never guessing whether the right version made it in.
 
-PRIVATE BY DESIGN
-Rawk On has no servers, no accounts, and no analytics. Your login tokens stay in your
-browser (chrome.storage.local) and the extension talks only to the music service you
-choose. Full policy: https://ry-ops.dev/privacy/rawk-on
+Run TIDAL today and Spotify tomorrow? Flip between them anytime. Each service keeps its
+own login and its own daily playlists, so there's no re-authenticating and nothing to
+reset when you switch.
 
-SETUP (one-time)
-Because Rawk On uses your own developer credentials, you'll create a free developer app
-on TIDAL or Spotify and paste a public Client ID into Settings. Step-by-step guides:
+WHY YOU'LL KEEP IT
+• Hover, click, saved — no copy-pasting song titles into a search box.
+• Bank a whole hour in a single tap.
+• TIDAL or Spotify, switchable on a whim.
+• A fresh, dated playlist for every day of listening.
+• Duplicate-aware, with a toast that shows exactly what was added.
+
+QUIETLY PRIVATE
+No accounts. No servers. No analytics. No tracking. Your login stays in your browser and
+Rawk On only ever talks to the music service you connected — it uses OAuth (PKCE), so the
+only thing you paste in is a public client ID, never a password.
+Full policy: https://ry-ops.dev/privacy/rawk-on
+
+ONE-TIME SETUP
+Rawk On runs on your own free developer credentials. Create a developer app on TIDAL or
+Spotify, paste the client ID into Settings, and you're set. Walkthroughs for both:
 https://github.com/ry-ops/rawk-on
+
+Built by a listener, for listeners. Rawk on. 🤘
 
 ———
 Icon: "Metal Hand" by Berkah Icon from the Noun Project.
