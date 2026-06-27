@@ -21,7 +21,9 @@ Manifest V3 · TypeScript · Vite · [CRXJS](https://crxjs.dev) · TIDAL & Spoti
   artist + album; if nothing matches the title, it adds *nothing* rather than the
   wrong track.
 - **Resilient** — backs off and retries on rate limits (HTTP 429).
-- **Your choice of service** — switch between TIDAL and Spotify anytime from Settings.
+- **Your choice of service** — switch between TIDAL and Spotify anytime from
+  Settings. Each keeps its own login and its own daily playlists, so you can bounce
+  back and forth freely with no re-login and nothing to reset.
 
 ## Privacy / security
 
@@ -65,17 +67,35 @@ redirect URI — stays constant across reloads and machines.
 > The account you log in with at the consent screen is the one whose playlists get
 > created — sign in with your **listening** account.
 
-### Spotify-specific note
+### Spotify setup notes
 
-Spotify requires your app to be in "development mode" and explicitly add testers
-until you apply for a quota extension. If you're the only user, just add your own
-Spotify account as a tester in the developer dashboard.
+A new Spotify app starts in **development mode**, which has two requirements that
+otherwise surface as a confusing `403 Forbidden` on playlist writes (search/reads
+keep working, which makes it look like an auth bug):
+
+- **The app owner needs Spotify Premium.** Without it, the dashboard blocks the app
+  from the Web API entirely.
+- **Allowlist your listening account.** In the dashboard, open your app →
+  **User Management** and add the exact account (name + the email on that Spotify
+  account) you log in with. Reads work without this; **writes** (create playlist,
+  add tracks) return 403 until you do.
+
+For wider distribution you'd request an Extended Quota Mode extension; for personal
+use, the two steps above are all you need.
 
 ## Use it
 
 Open <https://www.thecurrent.org/playlist/the-current>:
 - Hover a card → 🤘 **Add** (the toast shows the matched title + time).
 - Click **Add hour** in any hour header → the whole hour lands in its own playlist.
+
+### Maintenance — clearing cached playlists
+
+The extension remembers which playlist it created for each day so repeat adds land
+in the same place. Settings → **Maintenance** has a per-service **Clear cached
+playlists** button (two-click confirm) for when you've deleted a daily playlist on
+the service and want a fresh one. Your login isn't affected, and each service's
+cache is fully separate — switching services never needs a manual clear.
 
 ## Debugging
 
@@ -105,7 +125,7 @@ src/
     provider.ts             MusicProvider interface
     tidal-provider.ts       TidalProvider — auth, search, playlist ops (JSON:API)
     spotify-provider.ts     SpotifyProvider — auth, search, playlist ops (REST)
-    storage.ts              Token + playlist cache storage (provider-keyed)
+    storage.ts              Tokens (provider-keyed) + daily playlist cache (provider-scoped)
     service-worker.ts       Message router → active provider
   content/
     main.ts                 Wire cards + hour headers, toasts
