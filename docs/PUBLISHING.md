@@ -26,7 +26,7 @@ friction is high, so **clear per-provider setup docs are essential** (Phase 1).
       **"Metal Hand by Berkah Icon from the Noun Project."** Added to README credits;
       must also appear in each store listing description (see Phase 2).
 - [~] **Privacy policy** — `public/privacy.html` is **written and current** (covers
-      TIDAL + Spotify, brand-themed). Canonical URL: **https://ry-ops.dev/privacy**.
+      TIDAL + Spotify, brand-themed). Canonical URL: **https://ry-ops.dev/privacy/rawk-on**.
       Deploy the content there and confirm it loads before submitting.
 - [x] **Screenshots / promo art** — two 1280×800 PNGs in `docs/store/`
       (`screenshot-1`, `screenshot-2`). 440×280 promo tile still optional.
