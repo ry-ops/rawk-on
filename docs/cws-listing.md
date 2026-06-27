@@ -104,8 +104,12 @@ https://ry-ops.github.io/rawk-on/privacy.html
 ---
 
 ## Assets still needed before submit
-- [ ] **Privacy policy hosted** at a public URL → fill `https://ry-ops.github.io/rawk-on/privacy.html` above.
-- [ ] **Screenshots** — at least one 1280×800 or 640×400 PNG/JPEG. Best captured from
-      the live extension on a Current playlist page (the Add pill + a success toast),
-      plus the Settings page.
+- [ ] **Make the repo public** — required for free GitHub Pages (privacy URL) and so the
+      listing's setup-docs link resolves. (Owner action; secret scan came back clean.)
+- [ ] **Privacy policy hosted** — auto-deploys to `https://ry-ops.github.io/rawk-on/privacy.html`
+      via the Pages workflow once the repo is public + Pages is enabled. Confirm it loads.
+- [x] **Screenshots** — two 1280×800 PNGs ready in `docs/store/`:
+      `screenshot-1-1280x800.png` (idle "Add" state) and `screenshot-2-1280x800.png`
+      ("Added" success state). Upload one or both. *(Optional upgrade later: real captures
+      from the live extension on a Current playlist page.)*
 - [ ] *(optional)* 440×280 promo tile.
