@@ -52,7 +52,7 @@ FEATURES
 PRIVATE BY DESIGN
 Rawk On has no servers, no accounts, and no analytics. Your login tokens stay in your
 browser (chrome.storage.local) and the extension talks only to the music service you
-choose. Full policy: https://ry-ops.github.io/rawk-on/privacy.html
+choose. Full policy: https://ry-ops.dev/privacy
 
 SETUP (one-time)
 Because Rawk On uses your own developer credentials, you'll create a free developer app
@@ -63,7 +63,8 @@ https://github.com/ry-ops/rawk-on
 Icon: "Metal Hand" by Berkah Icon from the Noun Project.
 ```
 
-> Replace `https://ry-ops.github.io/rawk-on/privacy.html` with the hosted privacy.html URL once it's live.
+> Privacy URL is `https://ry-ops.dev/privacy`. Make sure that page is live and loads the
+> policy (content is in `public/privacy.html`) before submitting.
 
 ---
 
@@ -97,17 +98,16 @@ own TIDAL or Spotify account.
 
 **Privacy policy URL**
 ```
-https://ry-ops.github.io/rawk-on/privacy.html
+https://ry-ops.dev/privacy
 ```
-*(Live once the repo is public + the Pages workflow has run. Confirm it loads before submitting.)*
+*(Hosted on the ry-ops.dev site; content lives in `public/privacy.html`. Confirm it loads before submitting.)*
 
 ---
 
 ## Assets still needed before submit
-- [ ] **Make the repo public** — required for free GitHub Pages (privacy URL) and so the
-      listing's setup-docs link resolves. (Owner action; secret scan came back clean.)
-- [ ] **Privacy policy hosted** — auto-deploys to `https://ry-ops.github.io/rawk-on/privacy.html`
-      via the Pages workflow once the repo is public + Pages is enabled. Confirm it loads.
+- [x] **Make the repo public** — done (secret scan came back clean).
+- [ ] **Privacy policy live** at `https://ry-ops.dev/privacy` — deploy the content from
+      `public/privacy.html` to that page and confirm it loads.
 - [x] **Screenshots** — two 1280×800 PNGs ready in `docs/store/`:
       `screenshot-1-1280x800.png` (idle "Add" state) and `screenshot-2-1280x800.png`
       ("Added" success state). Upload one or both. *(Optional upgrade later: real captures

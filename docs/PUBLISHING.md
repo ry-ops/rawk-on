@@ -26,10 +26,10 @@ friction is high, so **clear per-provider setup docs are essential** (Phase 1).
       **"Metal Hand by Berkah Icon from the Noun Project."** Added to README credits;
       must also appear in each store listing description (see Phase 2).
 - [~] **Privacy policy** — `public/privacy.html` is **written and current** (covers
-      TIDAL + Spotify, brand-themed). Still needs a **public URL** to link from both
-      stores — host it (GitHub Pages from `public/`, or Cloudflare Pages).
-- [ ] **Screenshots / promo art** — at least one 1280×800 or 640×400; a 440×280
-      promo tile for CWS helps. None exist yet (`docs/demo-vinyl.svg` is README-only).
+      TIDAL + Spotify, brand-themed). Canonical URL: **https://ry-ops.dev/privacy**.
+      Deploy the content there and confirm it loads before submitting.
+- [x] **Screenshots / promo art** — two 1280×800 PNGs in `docs/store/`
+      (`screenshot-1`, `screenshot-2`). 440×280 promo tile still optional.
 - [ ] **Version** — bump `0.1.0` → `1.0.0` for first release (manifest + package.json).
 
 ## Phase 1 — User-facing provider setup docs (essential for Model A)
