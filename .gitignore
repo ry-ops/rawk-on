@@ -4,3 +4,6 @@ extension-private-key.pem
 *.log
 .DS_Store
 .vite/
+
+# build artifacts
+*.zip
