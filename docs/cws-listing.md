@@ -1,7 +1,10 @@
 # Chrome Web Store listing — copy & answers
 
 Ready-to-paste content for the CWS Developer Dashboard. Upload package:
-**`rawk-on-v1.0.1.zip`** (repo root, from `npm run build` → zipped `dist/`).
+**`rawk-on-v1.0.1.zip`** (repo root). Build it with **`npm run pack`** — that runs
+the build and strips the manifest `key` (the store rejects uploads containing
+`key`; we only pin it for a stable dev ID). Do **not** upload a plain
+`npm run build` zip, or you'll get *"key field is not allowed in manifest."*
 
 > ⚠️ **Redirect URI / extension ID:** the *published* extension ID is assigned by
 > the store and differs from the dev ID (`cdimphoionaa…`). Users copy the live
