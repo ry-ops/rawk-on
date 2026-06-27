@@ -3,7 +3,7 @@
 Add songs from [The Current](https://www.thecurrent.org/playlist/the-current)'s
 On-Air Playlist to **TIDAL** or **Spotify** — one track at a time, or a whole hour block at once.
 
-![Rawk On — add a track, or a whole hour](docs/demo.svg)
+![Rawk On — add a track, or a whole hour](docs/demo-vinyl.svg)
 
 A Chrome (Manifest V3) extension: hover a song card for a 🤘 **Add** pill, or use
 **Add hour** in any hour header to bulk-capture that hour into its own playlist.
@@ -117,7 +117,7 @@ place: `src/content/selectors.ts`.
 ```
 manifest.config.ts          MV3 manifest (CRXJS) — pinned key, icons, host_permissions
 public/privacy.html         Privacy policy (host this and link from CWS listing)
-docs/demo.svg               Animated README demo
+docs/demo-vinyl.svg         Animated README demo
 src/
   shared/
     config.ts               TIDAL + Spotify endpoints, scopes, playlist naming
