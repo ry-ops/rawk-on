@@ -1,22 +1,27 @@
-:root { color-scheme: light dark; }
-body { margin: 0; font: 13px/1.5 system-ui, sans-serif; background: #181b22; color: #e7e9ee; }
+:root {
+  color-scheme: dark;
+  --red: #da291c;        /* The Current red */
+  --red-bright: #e4382c; /* hover */
+}
+body { margin: 0; font: 13px/1.5 system-ui, sans-serif; background: #0a0a0a; color: #fff; }
 .pop { width: 260px; padding: 14px 16px; }
 .head { display: flex; align-items: center; justify-content: space-between; }
-.head strong { font-size: 15px; }
-.dot { width: 10px; height: 10px; border-radius: 50%; background: #6b7280; }
-.dot.on { background: #1db954; }
-.dot.off { background: #dc2626; }
+.head strong { font-size: 15px; display: inline-flex; align-items: center; gap: 7px; }
+.brand-mark { width: 20px; height: 20px; filter: invert(1); }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #555; }
+.dot.on { background: var(--red); box-shadow: 0 0 7px rgba(218, 41, 28, .7); }
+.dot.off { background: #555; }
 .status { margin: 10px 0 4px; font-weight: 600; }
-.hint { margin: 4px 0 14px; color: #9aa1ad; }
-.hint a { color: #1db954; }
+.hint { margin: 4px 0 14px; color: #a6a6a6; }
+.hint a { color: var(--red); }
 .btn {
   width: 100%;
   padding: 9px 12px;
   font: 600 13px/1 system-ui, sans-serif;
-  color: #042611;
-  background: #1db954;
+  color: #fff;
+  background: var(--red);
   border: none;
   border-radius: 8px;
   cursor: pointer;
 }
-.btn:hover { filter: brightness(1.05); }
+.btn:hover { background: var(--red-bright); }

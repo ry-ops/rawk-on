@@ -1,6 +1,6 @@
 {
   "name": "rawk-on",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Hover a song on The Current's playlist and add it to a daily TIDAL or Spotify playlist.",
   "type": "module",
   "scripts": {

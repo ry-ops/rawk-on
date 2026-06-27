@@ -1,6 +1,12 @@
 import type { Message, AuthResult, RedirectUriResult, ClearCacheResult } from '../shared/types.ts'
 import type { ProviderId } from '../shared/settings.ts'
 import { getSettings, setSettings } from '../shared/settings.ts'
+// Brand mark — the "metal hand" icon (Noun Project #1200426), inverted to white
+// in CSS so it reads on the dark header. Same asset the content-script pills use.
+import brandMarkUrl from '../assets/metal-hand.png?inline'
+
+const brandMark = document.getElementById('brandMark') as HTMLImageElement | null
+if (brandMark) brandMark.src = brandMarkUrl
 
 function $<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id)
