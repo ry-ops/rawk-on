@@ -43,8 +43,8 @@ const CSS = `
 .tp-add-btn:focus-visible { opacity: 1; }
 .tp-add-btn:hover { transform: scale(1.05); }
 .tp-add-btn[disabled] { cursor: default; }
-.tp-add-btn.tp-done { background: #1db954; border-color: #1db954; }
-.tp-add-btn.tp-dupe { background: #6b7280; border-color: #6b7280; }
+.tp-add-btn.tp-done { background: #da291c; border-color: #da291c; }
+.tp-add-btn.tp-dupe { background: #555; border-color: #555; }
 .tp-add-btn.tp-err  { background: #dc2626; border-color: #dc2626; }
 
 /* Inline "Add hour" pill in each hour header — always visible. */
@@ -68,7 +68,7 @@ const CSS = `
 .tp-hour-btn[disabled] { cursor: default; }
 .tp-hour-btn .tp-logo { width: 24px; height: 24px; }
 .tp-hour-btn .tp-spin { width: 24px; height: 24px; }
-.tp-hour-btn.tp-done { background: #1db954; border-color: #1db954; }
+.tp-hour-btn.tp-done { background: #da291c; border-color: #da291c; }
 .tp-hour-btn.tp-err  { background: #dc2626; border-color: #dc2626; }
 
 @keyframes tp-spin { to { transform: rotate(360deg); } }
@@ -105,13 +105,40 @@ const CSS = `
   transition: opacity .18s ease, transform .18s ease;
 }
 .tp-toast.tp-show { opacity: 1; transform: translateY(0); }
-.tp-toast.tp-ok   { background: #1db954; }
-.tp-toast.tp-info { background: #374151; }
+.tp-toast.tp-ok   { background: #da291c; }
+.tp-toast.tp-info { background: #333; }
 .tp-toast.tp-bad  { background: #dc2626; }
 .tp-toast a { color: #fff; text-decoration: underline; }
 `
 
 const logoImg = `<img class="tp-logo" src="${logoUrl}" alt="" />`
+
+// Active service label, kept in sync from settings by the content script so pill
+// captions read "TIDAL" or "Spotify" — matching where songs actually land.
+const SERVICE_LABELS: Record<string, string> = { tidal: 'TIDAL', spotify: 'Spotify' }
+let serviceLabel = 'your playlist'
+
+export function getServiceLabel(): string {
+  return serviceLabel
+}
+
+export function setServiceLabel(provider: string): void {
+  const next = SERVICE_LABELS[provider]
+  if (!next || next === serviceLabel) return
+  serviceLabel = next
+  // Refresh captions on idle buttons already wired into the page.
+  document.querySelectorAll<HTMLButtonElement>('.tp-add-btn').forEach((b) => {
+    if (!/tp-done|tp-dupe|tp-err/.test(b.className)) {
+      b.title = `Add to today’s ${serviceLabel} playlist`
+      b.setAttribute('aria-label', `Add to ${serviceLabel}`)
+    }
+  })
+  document.querySelectorAll<HTMLButtonElement>('.tp-hour-btn').forEach((b) => {
+    if (!/tp-done|tp-err/.test(b.className)) {
+      b.title = `Add this hour’s songs to a new ${serviceLabel} playlist`
+    }
+  })
+}
 
 function pill(label: string, opts: { spinner?: boolean } = {}): string {
   const icon = opts.spinner ? '<span class="tp-spin"></span>' : logoImg
@@ -132,8 +159,8 @@ export function createAddButton(
   const btn = document.createElement('button')
   btn.className = 'tp-add-btn'
   btn.type = 'button'
-  btn.title = 'Add to today’s TIDAL playlist'
-  btn.setAttribute('aria-label', 'Add to TIDAL')
+  btn.title = `Add to today’s ${serviceLabel} playlist`
+  btn.setAttribute('aria-label', `Add to ${serviceLabel}`)
   btn.innerHTML = pill('Add')
   btn.addEventListener('click', (e) => {
     e.preventDefault()
@@ -157,7 +184,7 @@ export function setButtonState(
     case 'done':
       btn.classList.add('tp-done')
       btn.innerHTML = pill('Added ✓')
-      btn.title = 'Added to TIDAL'
+      btn.title = `Added to ${serviceLabel}`
       break
     case 'dupe':
       btn.classList.add('tp-dupe')
@@ -171,7 +198,7 @@ export function setButtonState(
       break
     default:
       btn.innerHTML = pill('Add')
-      btn.title = 'Add to today’s TIDAL playlist'
+      btn.title = `Add to today’s ${serviceLabel} playlist`
   }
 }
 
@@ -183,7 +210,7 @@ export function createHourButton(
   const btn = document.createElement('button')
   btn.className = 'tp-hour-btn'
   btn.type = 'button'
-  btn.title = 'Add this hour’s songs to a new TIDAL playlist'
+  btn.title = `Add this hour’s songs to a new ${serviceLabel} playlist`
   btn.innerHTML = pill('Add hour')
   btn.addEventListener('click', (e) => {
     e.preventDefault()

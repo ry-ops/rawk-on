@@ -8,8 +8,11 @@ import {
   createHourButton,
   setHourButtonState,
   toast,
+  setServiceLabel,
+  getServiceLabel,
 } from './ui.ts'
 import { localISODate } from '../shared/config.ts'
+import { getSettings } from '../shared/settings.ts'
 
 const MARK = 'tpWired' // dataset flag so we never double-wire a row
 const HOUR_MARK = 'tpHourWired'
@@ -82,7 +85,7 @@ async function handleAdd(row: HTMLElement, btn: HTMLButtonElement): Promise<void
     } else {
       setButtonState(btn, 'done')
       toast(
-        `Added <strong>${res.matchedTitle ?? track.title}</strong> to TIDAL · ${secs}s${open}`,
+        `Added <strong>${res.matchedTitle ?? track.title}</strong> to ${getServiceLabel()} · ${secs}s${open}`,
         'ok',
       )
     }
@@ -91,7 +94,7 @@ async function handleAdd(row: HTMLElement, btn: HTMLButtonElement): Promise<void
     toast(`Already in today’s playlist: <strong>${track.title}</strong>`, 'info')
   } else if (!res.ok && res.needsAuth) {
     setButtonState(btn, 'error')
-    toast('Not connected to TIDAL. Open the extension settings to log in.', 'bad', 5000)
+    toast(`Not connected to ${getServiceLabel()}. Open the extension settings to log in.`, 'bad', 5000)
   } else if (!res.ok) {
     setButtonState(btn, 'error')
     toast(`Couldn’t add: ${res.error}`, 'bad', 5000)
@@ -169,7 +172,7 @@ async function handleAddHour(
     setHourButtonState(btn, 'error', 'Retry')
     toast(
       res.needsAuth
-        ? 'Not connected to TIDAL. Open settings to log in.'
+        ? `Not connected to ${getServiceLabel()}. Open settings to log in.`
         : `Couldn’t add hour: ${res.error}`,
       'bad',
       6000,
@@ -228,8 +231,22 @@ async function rawkSearch(query: string): Promise<unknown> {
   return res
 }
 
+/** Read the active provider so pill captions name the right service. */
+async function syncServiceLabel(): Promise<void> {
+  try {
+    const { provider } = await getSettings()
+    setServiceLabel(provider)
+  } catch {
+    /* settings unavailable (e.g. context invalidated) — keep current label */
+  }
+}
+
 function start(): void {
   injectStyles()
+  void syncServiceLabel()
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes['rawkOnSettings']) void syncServiceLabel()
+  })
   scan()
   // The playlist hydrates and updates over time; keep wiring new rows.
   const observer = new MutationObserver(() => scan())
