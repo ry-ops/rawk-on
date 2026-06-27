@@ -45,7 +45,7 @@ const CSS = `
 .tp-add-btn[disabled] { cursor: default; }
 .tp-add-btn.tp-done { background: #da291c; border-color: #da291c; }
 .tp-add-btn.tp-dupe { background: #555; border-color: #555; }
-.tp-add-btn.tp-err  { background: #dc2626; border-color: #dc2626; }
+.tp-add-btn.tp-err  { background: #7a1410; border-color: #a6271d; }
 
 /* Inline "Add hour" pill in each hour header — always visible. */
 .tp-hour-btn {
@@ -69,7 +69,7 @@ const CSS = `
 .tp-hour-btn .tp-logo { width: 24px; height: 24px; }
 .tp-hour-btn .tp-spin { width: 24px; height: 24px; }
 .tp-hour-btn.tp-done { background: #da291c; border-color: #da291c; }
-.tp-hour-btn.tp-err  { background: #dc2626; border-color: #dc2626; }
+.tp-hour-btn.tp-err  { background: #7a1410; border-color: #a6271d; }
 
 @keyframes tp-spin { to { transform: rotate(360deg); } }
 .tp-spin {
@@ -107,7 +107,7 @@ const CSS = `
 .tp-toast.tp-show { opacity: 1; transform: translateY(0); }
 .tp-toast.tp-ok   { background: #da291c; }
 .tp-toast.tp-info { background: #333; }
-.tp-toast.tp-bad  { background: #dc2626; }
+.tp-toast.tp-bad  { background: #7a1410; }
 .tp-toast a { color: #fff; text-decoration: underline; }
 `
 
