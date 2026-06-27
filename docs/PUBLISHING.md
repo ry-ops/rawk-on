@@ -17,10 +17,10 @@ friction is high, so **clear per-provider setup docs are essential** (Phase 1).
 
 ## Phase 0 — Store-agnostic prep (serves both stores)
 
-- [ ] **Fix manifest `description`** — currently TIDAL-only ("add it to a daily
-      TIDAL playlist"); should mention TIDAL **and** Spotify.
-- [ ] **Clean stale comment** in `manifest.config.ts` (top comment says "No key is
-      pinned" but a key *is* pinned).
+- [x] **Fix manifest `description`** — now mentions TIDAL **and** Spotify (also
+      synced `package.json`).
+- [x] **Clean stale comment** in `manifest.config.ts` (removed the contradictory
+      "No key is pinned" block).
 - [ ] **Icon licensing** — metal-hand is Noun Project #1200426 (**CC BY**). Either
       attribute the creator in every store listing, buy a Noun Project license, or
       commission/replace the icon. Required before public distribution.
@@ -34,20 +34,12 @@ friction is high, so **clear per-provider setup docs are essential** (Phase 1).
 
 Write step-by-step guides; link from README **and** the extension's Settings page.
 
-- [ ] `docs/setup-spotify.md`
-  - Create app at developer.spotify.com/dashboard
-  - Add the **Redirect URI** shown in Settings (per-user, per published extension ID)
-  - **App owner must have Spotify Premium** (else Web API is blocked)
-  - **User Management** → add your listening account (name + email) — required for
-    write operations (creating playlists / adding tracks), else `403 Forbidden`
-  - Paste the Client ID into Settings → Save → Log in
-- [ ] `docs/setup-tidal.md`
-  - Create app at developer.tidal.com/dashboard
-  - Add the Redirect URI from Settings
-  - Scopes: `playlists.read`, `playlists.write`, `collection.*`, `search.read`
-  - Paste the Client ID → Save → Log in
-- [ ] Link both from README "Connect your music service" and from `credNote` in
-      `options/index.html` (the per-provider hint text).
+- [x] `docs/setup-spotify.md` — create app, redirect URI, **owner Premium**,
+      **User Management allowlist**, client ID, troubleshooting table.
+- [x] `docs/setup-tidal.md` — create app, redirect URI, scopes, client ID,
+      troubleshooting table.
+- [x] Linked from README "Connect your music service" + Spotify notes, and from the
+      Settings page (per-provider "Setup guide ↗" link via `PROVIDER_META.guide`).
 
 ## Phase 2 — Chrome Web Store
 

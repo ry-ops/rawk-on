@@ -1,10 +1,5 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 
-// No `key` is pinned here. For an unpacked extension Chrome derives a stable
-// ID from the install folder path, so your OAuth redirect URI stays constant
-// on your machine during development. The popup shows the exact redirect URI
-// to register in the TIDAL portal. When you publish, add a real `key` (see
-// README) so the ID — and thus the redirect URI — is stable everywhere.
 export default defineManifest({
   manifest_version: 3,
   // Pinned public key → permanent extension ID (cdimphoionaangeagpenibioamgmbbfd),
@@ -16,7 +11,7 @@ export default defineManifest({
   name: 'Rawk On',
   version: '0.1.0',
   description:
-    "Hover a song on The Current's playlist and add it to a daily TIDAL playlist.",
+    "Hover a song on The Current's playlist and add it to a daily TIDAL or Spotify playlist.",
   icons: {
     16: 'icons/icon-16.png',
     32: 'icons/icon-32.png',

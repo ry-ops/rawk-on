@@ -61,6 +61,9 @@ npm run build        # type-checks, then emits dist/
    add that exact URI to its **Redirect URIs**, then **Save**. Login fails until you do this.
 5. Back in Settings, enter your **Client ID**, **Save**, then **Log in**.
 
+**Step-by-step guides per service:** [Connect Spotify](docs/setup-spotify.md) ·
+[Connect TIDAL](docs/setup-tidal.md).
+
 A `key` is pinned in `manifest.config.ts`, so the extension ID — and thus the
 redirect URI — stays constant across reloads and machines.
 
@@ -81,7 +84,7 @@ keep working, which makes it look like an auth bug):
   add tracks) return 403 until you do.
 
 For wider distribution you'd request an Extended Quota Mode extension; for personal
-use, the two steps above are all you need.
+use, the two steps above are all you need. Full walkthrough: [Connect Spotify](docs/setup-spotify.md).
 
 ## Use it
 
