@@ -25,16 +25,18 @@ const authError = $<HTMLParagraphElement>('authError')
 const clearCacheBtn = $<HTMLButtonElement>('clearCacheBtn')
 const clearMsg = $<HTMLSpanElement>('clearMsg')
 
-const PROVIDER_META: Record<ProviderId, { label: string; portal: string; note: string }> = {
+const PROVIDER_META: Record<ProviderId, { label: string; portal: string; note: string; guide: string }> = {
   tidal: {
     label: 'TIDAL',
     portal: 'https://developer.tidal.com/dashboard',
     note: 'PKCE flow — no client secret needed. Register your app at developer.tidal.com.',
+    guide: 'https://github.com/ry-ops/rawk-on/blob/main/docs/setup-tidal.md',
   },
   spotify: {
     label: 'Spotify',
     portal: 'https://developer.spotify.com/dashboard',
     note: 'PKCE flow — no client secret needed. Register your app at developer.spotify.com.',
+    guide: 'https://github.com/ry-ops/rawk-on/blob/main/docs/setup-spotify.md',
   },
 }
 
@@ -51,7 +53,13 @@ function renderProvider(p: ProviderId): void {
   providerTidalBtn.classList.toggle('tab-active', p === 'tidal')
   providerSpotifyBtn.classList.toggle('tab-active', p === 'spotify')
 
-  credNote.textContent = meta.note
+  credNote.textContent = `${meta.note} `
+  const guideLink = document.createElement('a')
+  guideLink.href = meta.guide
+  guideLink.target = '_blank'
+  guideLink.rel = 'noopener'
+  guideLink.textContent = 'Setup guide ↗'
+  credNote.appendChild(guideLink)
   portalLink.href = meta.portal
   portalLink.textContent = `developer.${p === 'tidal' ? 'tidal' : 'spotify'}.com`
   loginBtn.textContent = `Log in to ${meta.label}`
