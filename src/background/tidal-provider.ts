@@ -295,9 +295,10 @@ export class TidalProvider implements MusicProvider {
     const t0 = performance.now()
     try {
       const isoDate = localISODate(new Date())
+      const cacheKey = `${this.id}·${isoDate}` // provider-scoped so Spotify/Tidal don't share playlist ids
       const [[match, msSearch], [daily, msEnsure]] = await Promise.all([
         timed(() => this.searchTrackId(track)),
-        timed(() => this.ensurePlaylist(isoDate, dailyPlaylistName(isoDate))),
+        timed(() => this.ensurePlaylist(cacheKey, dailyPlaylistName(isoDate))),
       ])
 
       if (!match) return { ok: false, error: `No TIDAL match for "${track.artist} – ${track.title}".` }
@@ -307,8 +308,8 @@ export class TidalProvider implements MusicProvider {
         return { ok: true, status: 'duplicate', playlistId: daily.id, playlistUrl: this.playlistUrl(daily.id), matched: track, matchedTitle: match.title, ms: Math.round(performance.now() - t0) }
       }
 
-      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(isoDate, dailyPlaylistName(isoDate), daily, [match.id]))
-      await recordAddedTrack(isoDate, match.id)
+      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(cacheKey, dailyPlaylistName(isoDate), daily, [match.id]))
+      await recordAddedTrack(cacheKey, match.id)
 
       if (DEBUG) console.log(`[rawk-on/tidal] timing search=${Math.round(msSearch)}ms ensure=${Math.round(msEnsure)}ms add=${Math.round(msAdd)}ms`)
       return { ok: true, status: 'added', playlistId, playlistUrl: this.playlistUrl(playlistId), matched: track, matchedTitle: match.title, ms: Math.round(performance.now() - t0) }
@@ -320,7 +321,7 @@ export class TidalProvider implements MusicProvider {
   async addHour(date: string, hourLabel: string, tracks: TrackInfo[]): Promise<AddHourResult> {
     const t0 = performance.now()
     try {
-      const cacheKey = `${date}·${hourLabel}`
+      const cacheKey = `${this.id}·${date}·${hourLabel}` // provider-scoped
       const name = `The Current - ${date} · ${hourLabel}`
       const daily = await this.ensurePlaylist(cacheKey, name)
       const seen = new Set(daily.trackIds)

@@ -33,6 +33,7 @@ export type Message =
   | { type: 'GET_REDIRECT_URI' }
   | { type: 'SEARCH_DEBUG'; query: string }
   | { type: 'ADD_HOUR'; date: string; hourLabel: string; tracks: TrackInfo[] }
+  | { type: 'CLEAR_CACHE'; provider: 'tidal' | 'spotify' }
 
 export interface SearchHit {
   rank: number
@@ -74,6 +75,10 @@ export type AddHourResult =
 
 export type AuthResult =
   | { ok: true; state: AuthState }
+  | { ok: false; error: string }
+
+export type ClearCacheResult =
+  | { ok: true; removed: number }
   | { ok: false; error: string }
 
 export type RedirectUriResult = { redirectUri: string }

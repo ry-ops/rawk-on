@@ -1,4 +1,4 @@
-import type { Message, AuthResult, RedirectUriResult } from '../shared/types.ts'
+import type { Message, AuthResult, RedirectUriResult, ClearCacheResult } from '../shared/types.ts'
 import type { ProviderId } from '../shared/settings.ts'
 import { getSettings, setSettings } from '../shared/settings.ts'
 
@@ -22,6 +22,8 @@ const statusText = $<HTMLSpanElement>('statusText')
 const loginBtn = $<HTMLButtonElement>('loginBtn')
 const logoutBtn = $<HTMLButtonElement>('logoutBtn')
 const authError = $<HTMLParagraphElement>('authError')
+const clearCacheBtn = $<HTMLButtonElement>('clearCacheBtn')
+const clearMsg = $<HTMLSpanElement>('clearMsg')
 
 const PROVIDER_META: Record<ProviderId, { label: string; portal: string; note: string }> = {
   tidal: {
@@ -53,6 +55,7 @@ function renderProvider(p: ProviderId): void {
   portalLink.href = meta.portal
   portalLink.textContent = `developer.${p === 'tidal' ? 'tidal' : 'spotify'}.com`
   loginBtn.textContent = `Log in to ${meta.label}`
+  resetClearBtn()
 }
 
 function renderAuth(connected: boolean): void {
@@ -130,6 +133,30 @@ loginBtn.addEventListener('click', async () => {
 logoutBtn.addEventListener('click', async () => {
   const res = await send<AuthResult>({ type: 'LOGOUT' })
   if (res.ok) renderAuth(res.state.connected)
+})
+
+// ── Clear cached playlists (two-click confirm, scoped to active provider) ─────
+
+let clearArmed = false
+let clearTimer: ReturnType<typeof setTimeout> | undefined
+
+function resetClearBtn(): void {
+  clearArmed = false
+  if (clearTimer) clearTimeout(clearTimer)
+  clearCacheBtn.textContent = `Clear ${PROVIDER_META[activeProvider].label} cached playlists`
+}
+
+clearCacheBtn.addEventListener('click', async () => {
+  if (!clearArmed) {
+    clearArmed = true
+    clearCacheBtn.textContent = 'Click again to confirm'
+    clearTimer = setTimeout(resetClearBtn, 3000)
+    return
+  }
+  resetClearBtn()
+  const res = await send<ClearCacheResult>({ type: 'CLEAR_CACHE', provider: activeProvider })
+  clearMsg.textContent = res.ok ? `Cleared ${res.removed} ✓` : res.error
+  setTimeout(() => (clearMsg.textContent = ''), 2500)
 })
 
 void loadSettings()

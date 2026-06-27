@@ -1,15 +1,22 @@
-import type { Message, AddTrackResult, AddHourResult, AuthResult, RedirectUriResult, SearchDebugResult } from '../shared/types.ts'
+import type { Message, AddTrackResult, AddHourResult, AuthResult, RedirectUriResult, SearchDebugResult, ClearCacheResult } from '../shared/types.ts'
 import { getSettings } from '../shared/settings.ts'
 import { TidalProvider } from './tidal-provider.ts'
 import { SpotifyProvider } from './spotify-provider.ts'
+import { clearDaily, purgeLegacyDaily } from './storage.ts'
 import type { MusicProvider } from './provider.ts'
 
-type Response = AddTrackResult | AddHourResult | AuthResult | RedirectUriResult | SearchDebugResult
+type Response = AddTrackResult | AddHourResult | AuthResult | RedirectUriResult | SearchDebugResult | ClearCacheResult
 
 const providers: Record<string, MusicProvider> = {
   tidal: new TidalProvider(),
   spotify: new SpotifyProvider(),
 }
+
+// On load, drop any pre-provider-scoping cache entries so a stale id from one
+// service can never be reused by the other.
+void purgeLegacyDaily(Object.keys(providers)).then((n) => {
+  if (n) console.log(`[rawk-on] purged ${n} legacy playlist-cache entr${n === 1 ? 'y' : 'ies'}`)
+})
 
 async function getProvider(): Promise<MusicProvider> {
   const { provider } = await getSettings()
@@ -57,6 +64,11 @@ async function handle(msg: Message): Promise<Response> {
     case 'ADD_HOUR': {
       const p = await getProvider()
       return p.addHour(msg.date, msg.hourLabel, msg.tracks)
+    }
+
+    case 'CLEAR_CACHE': {
+      const removed = await clearDaily(msg.provider)
+      return { ok: true, removed }
     }
   }
 }

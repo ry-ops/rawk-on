@@ -68,3 +68,29 @@ export async function dropDaily(key: string): Promise<void> {
   delete map[key]
   await writeMap(map)
 }
+
+/** Remove all cached daily playlists for one provider (keys like "tidal·2026-06-27"). */
+export async function clearDaily(providerId: string): Promise<number> {
+  const map = await readMap()
+  let removed = 0
+  for (const key of Object.keys(map)) {
+    if (key.startsWith(`${providerId}·`)) { delete map[key]; removed++ }
+  }
+  if (removed) await writeMap(map)
+  return removed
+}
+
+/**
+ * One-time migration: drop legacy entries saved before cache keys were
+ * provider-scoped. Any key not prefixed with a known provider id (e.g. a bare
+ * "2026-06-27") could hold the wrong service's playlist id, so purge it.
+ */
+export async function purgeLegacyDaily(knownProviderIds: string[]): Promise<number> {
+  const map = await readMap()
+  let removed = 0
+  for (const key of Object.keys(map)) {
+    if (!knownProviderIds.some((id) => key.startsWith(`${id}·`))) { delete map[key]; removed++ }
+  }
+  if (removed) await writeMap(map)
+  return removed
+}

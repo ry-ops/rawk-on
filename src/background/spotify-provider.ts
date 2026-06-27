@@ -142,12 +142,6 @@ export class SpotifyProvider implements MusicProvider {
     return tokens.accessToken
   }
 
-  private async getUserId(): Promise<string> {
-    const tokens = await getTokens(TOKEN_KEY)
-    if (!tokens?.userId) throw new NeedsAuthError('Not connected to Spotify.')
-    return tokens.userId
-  }
-
   private async refresh(tokens: Tokens): Promise<Tokens> {
     const { spotifyClientId: clientId } = await getSettings()
     const res = await fetch(SPOTIFY.tokenUrl, {
@@ -232,8 +226,8 @@ export class SpotifyProvider implements MusicProvider {
   // ── Playlist ops ──────────────────────────────────────────────────────────
 
   private async createPlaylist(name: string): Promise<string> {
-    const userId = await this.getUserId()
-    const res = await this.api<{ id: string }>(`/users/${userId}/playlists`, {
+    // Spotify deprecated POST /users/{id}/playlists (now returns 403); /me/playlists is the current endpoint.
+    const res = await this.api<{ id: string }>(`/me/playlists`, {
       method: 'POST',
       body: JSON.stringify({ name, description: 'Captured from The Current via Rawk On.', public: false }),
     })
@@ -252,7 +246,8 @@ export class SpotifyProvider implements MusicProvider {
   private async addItems(playlistId: string, trackIds: string[]): Promise<void> {
     for (let i = 0; i < trackIds.length; i += 100) {
       const chunk = trackIds.slice(i, i + 100)
-      await this.api(`/playlists/${playlistId}/tracks`, {
+      // /tracks is deprecated (403); /items is the current add-to-playlist endpoint.
+      await this.api(`/playlists/${playlistId}/items`, {
         method: 'POST',
         body: JSON.stringify({ uris: chunk.map((id) => `spotify:track:${id}`) }),
       })
@@ -285,9 +280,10 @@ export class SpotifyProvider implements MusicProvider {
     const t0 = performance.now()
     try {
       const isoDate = localISODate(new Date())
+      const cacheKey = `${this.id}·${isoDate}` // provider-scoped so Spotify/Tidal don't share playlist ids
       const [[match, msSearch], [daily, msEnsure]] = await Promise.all([
         timed(() => this.searchTrackId(track)),
-        timed(() => this.ensurePlaylist(isoDate, dailyPlaylistName(isoDate))),
+        timed(() => this.ensurePlaylist(cacheKey, dailyPlaylistName(isoDate))),
       ])
 
       if (!match) return { ok: false, error: `No Spotify match for "${track.artist} – ${track.title}".` }
@@ -297,8 +293,8 @@ export class SpotifyProvider implements MusicProvider {
         return { ok: true, status: 'duplicate', playlistId: daily.id, playlistUrl: this.playlistUrl(daily.id), matched: track, matchedTitle: match.title, ms: Math.round(performance.now() - t0) }
       }
 
-      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(isoDate, dailyPlaylistName(isoDate), daily, [match.id]))
-      await recordAddedTrack(isoDate, match.id)
+      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(cacheKey, dailyPlaylistName(isoDate), daily, [match.id]))
+      await recordAddedTrack(cacheKey, match.id)
 
       if (DEBUG) console.log(`[rawk-on/spotify] timing search=${Math.round(msSearch)}ms ensure=${Math.round(msEnsure)}ms add=${Math.round(msAdd)}ms`)
       return { ok: true, status: 'added', playlistId, playlistUrl: this.playlistUrl(playlistId), matched: track, matchedTitle: match.title, ms: Math.round(performance.now() - t0) }
@@ -310,7 +306,7 @@ export class SpotifyProvider implements MusicProvider {
   async addHour(date: string, hourLabel: string, tracks: TrackInfo[]): Promise<AddHourResult> {
     const t0 = performance.now()
     try {
-      const cacheKey = `${date}·${hourLabel}`
+      const cacheKey = `${this.id}·${date}·${hourLabel}` // provider-scoped
       const name = `The Current - ${date} · ${hourLabel}`
       const daily = await this.ensurePlaylist(cacheKey, name)
       const seen = new Set(daily.trackIds)
