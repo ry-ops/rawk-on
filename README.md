@@ -125,6 +125,10 @@ To publish:
    the creator in your listing description, or purchase a Noun Project license.
 4. Zip the `dist/` folder and upload to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).
 
+## What's next
+
+The Current is just the start — we're exploring other music-forward sites that could inspire a playlist. If you have a site in mind, open an issue.
+
 ## Credits
 
 Metal-hand icon: [Noun Project #1200426](https://thenounproject.com/icon/metal-hand-1200426/)
