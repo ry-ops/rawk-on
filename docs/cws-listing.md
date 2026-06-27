@@ -52,7 +52,7 @@ FEATURES
 PRIVATE BY DESIGN
 Rawk On has no servers, no accounts, and no analytics. Your login tokens stay in your
 browser (chrome.storage.local) and the extension talks only to the music service you
-choose. Full policy: <PRIVACY_URL>
+choose. Full policy: https://ry-ops.github.io/rawk-on/privacy.html
 
 SETUP (one-time)
 Because Rawk On uses your own developer credentials, you'll create a free developer app
@@ -63,7 +63,7 @@ https://github.com/ry-ops/rawk-on
 Icon: "Metal Hand" by Berkah Icon from the Noun Project.
 ```
 
-> Replace `<PRIVACY_URL>` with the hosted privacy.html URL once it's live.
+> Replace `https://ry-ops.github.io/rawk-on/privacy.html` with the hosted privacy.html URL once it's live.
 
 ---
 
@@ -97,13 +97,14 @@ own TIDAL or Spotify account.
 
 **Privacy policy URL**
 ```
-<PRIVACY_URL>   (host public/privacy.html and paste the URL here)
+https://ry-ops.github.io/rawk-on/privacy.html
 ```
+*(Live once the repo is public + the Pages workflow has run. Confirm it loads before submitting.)*
 
 ---
 
 ## Assets still needed before submit
-- [ ] **Privacy policy hosted** at a public URL → fill `<PRIVACY_URL>` above.
+- [ ] **Privacy policy hosted** at a public URL → fill `https://ry-ops.github.io/rawk-on/privacy.html` above.
 - [ ] **Screenshots** — at least one 1280×800 or 640×400 PNG/JPEG. Best captured from
       the live extension on a Current playlist page (the Add pill + a success toast),
       plus the Settings page.
