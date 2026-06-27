@@ -66,7 +66,7 @@ QUIETLY PRIVATE
 No accounts. No servers. No analytics. No tracking. Your login stays in your browser and
 Rawk On only ever talks to the music service you connected — it uses OAuth (PKCE), so the
 only thing you paste in is a public client ID, never a password.
-Full policy: https://ry-ops.dev/privacy/rawk-on
+Full policy: https://ry-ops.dev/privacy
 
 ONE-TIME SETUP
 Rawk On runs on your own free developer credentials. Create a developer app on TIDAL or
@@ -79,8 +79,8 @@ Built by a listener, for listeners. Rawk on. 🤘
 Icon: "Metal Hand" by Berkah Icon from the Noun Project.
 ```
 
-> Privacy URL is `https://ry-ops.dev/privacy/rawk-on`. Make sure that page is live and loads the
-> policy (content is in `public/privacy.html`) before submitting.
+> Privacy URL is `https://ry-ops.dev/privacy` — **live and verified**; it includes a
+> "Rawk On (browser extension)" section under Product-specific disclosures.
 
 ---
 
@@ -114,18 +114,19 @@ own TIDAL or Spotify account.
 
 **Privacy policy URL**
 ```
-https://ry-ops.dev/privacy/rawk-on
+https://ry-ops.dev/privacy
 ```
 *(Hosted on the ry-ops.dev site; content lives in `public/privacy.html`. Confirm it loads before submitting.)*
 
 ---
 
-## Assets still needed before submit
-- [x] **Make the repo public** — done (secret scan came back clean).
-- [ ] **Privacy policy live** at `https://ry-ops.dev/privacy/rawk-on` — deploy the content from
-      `public/privacy.html` to that page and confirm it loads.
-- [x] **Screenshots** — two 1280×800 PNGs ready in `docs/store/`:
-      `screenshot-1-1280x800.png` (idle "Add" state) and `screenshot-2-1280x800.png`
-      ("Added" success state). Upload one or both. *(Optional upgrade later: real captures
-      from the live extension on a Current playlist page.)*
-- [ ] *(optional)* 440×280 promo tile.
+## Assets — all ready
+- [x] **Repo public** — done (secret scan came back clean).
+- [x] **Privacy policy live** at `https://ry-ops.dev/privacy` — verified; includes a
+      "Rawk On (browser extension)" section.
+- [x] **Package** — `rawk-on-v1.0.1.zip` built with `npm run pack` (no manifest `key`).
+- [x] **Screenshots** — two 1280×800 24-bit PNGs (no alpha) in `docs/store/`
+      (`screenshot-1`, `screenshot-2`).
+- [x] **Store icon** — `docs/store/store-icon-128.png` (128×128).
+- [x] **Small promo tile** — `docs/store/promo-small-440x280.png` (440×280, no alpha).
+- [x] **Marquee promo tile** — `docs/store/promo-marquee-1400x560.png` (1400×560, no alpha).
