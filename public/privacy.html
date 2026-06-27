@@ -5,41 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rawk On — Privacy Policy</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; line-height: 1.6; color: #222; }
-    h1 { font-size: 1.5rem; }
-    h2 { font-size: 1.1rem; margin-top: 2rem; }
+    :root { color-scheme: dark; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      max-width: 660px; margin: 0 auto; padding: 3rem 1.25rem 4rem;
+      line-height: 1.65; color: #fff; background: #0a0a0a;
+    }
+    h1 { font-size: 1.6rem; margin: 0 0 .25rem; }
+    h2 { font-size: 1.05rem; margin-top: 2rem; text-transform: uppercase; letter-spacing: .04em; color: #a6a6a6; }
+    .updated { color: #a6a6a6; margin: 0 0 1.5rem; }
+    code { background: #151515; border: 1px solid #2a2a2a; border-radius: 4px; padding: 1px 5px; font-size: .9em; }
+    a { color: #da291c; text-underline-offset: 2px; }
+    a:hover { color: #e4382c; }
+    strong { color: #fff; }
+    li { margin: .35rem 0; }
+    hr { border: none; border-top: 1px solid #2a2a2a; margin: 2.5rem 0; }
+    .lede { color: #e4e4e7; }
   </style>
 </head>
 <body>
-  <h1>Rawk On — Privacy Policy</h1>
-  <p><em>Last updated: 2026-06-26</em></p>
+  <h1>🤘 Rawk On — Privacy Policy</h1>
+  <p class="updated"><em>Last updated: 2026-06-27</em></p>
 
-  <h2>What we collect</h2>
-  <p>Rawk On stores the following <strong>locally in your browser</strong> using <code>chrome.storage.local</code>:</p>
+  <p class="lede">Rawk On adds songs from The Current's on-air playlist to a daily playlist on
+  <strong>TIDAL</strong> or <strong>Spotify</strong>. It runs entirely in your browser. There are
+  no Rawk On servers, accounts, or analytics — your data stays on your device and only travels to the
+  music service <em>you</em> choose to connect.</p>
+
+  <h2>What we store</h2>
+  <p>Rawk On keeps the following <strong>locally in your browser</strong> via <code>chrome.storage.local</code>:</p>
   <ul>
-    <li>Your TIDAL <strong>Client ID</strong> (entered by you in Settings)</li>
-    <li>Your TIDAL <strong>OAuth access and refresh tokens</strong>, obtained when you log in</li>
-    <li>A short-lived cache of playlist IDs to avoid duplicate adds</li>
+    <li>Your <strong>Client ID</strong> for the service you connect (TIDAL and/or Spotify), entered by you in Settings. A client ID is public by design — it is not a secret.</li>
+    <li>The <strong>OAuth access and refresh tokens</strong> issued when you log in, used to add songs to your playlists. Stored per service (<code>tidalTokens</code>, <code>spotifyTokens</code>).</li>
+    <li>Your <strong>settings</strong> (<code>rawkOnSettings</code>) — which service is active.</li>
+    <li>A short-lived <strong>cache of that day's playlist IDs</strong>, so a song isn't added twice. You can clear it anytime from Settings → "Clear cached playlists."</li>
   </ul>
-  <p>None of this data ever leaves your device to our servers — we have no servers.</p>
+  <p>None of this is ever transmitted to us — <strong>we have no servers</strong>.</p>
 
   <h2>What we don't collect</h2>
-  <p>Rawk On does not collect analytics, crash reports, or any personally identifiable information. It contains no tracking scripts.</p>
+  <p>No analytics, no crash reports, no advertising identifiers, no personally identifiable
+  information, and no tracking scripts. Rawk On does not sell or share any data.</p>
 
   <h2>Third-party services</h2>
-  <p>The extension communicates directly with:</p>
+  <p>The extension talks <strong>directly</strong> to the services you opt into:</p>
   <ul>
-    <li><strong>TIDAL</strong> (<code>openapi.tidal.com</code>, <code>auth.tidal.com</code>, <code>login.tidal.com</code>) — to authenticate and manage your playlists. TIDAL's own <a href="https://tidal.com/privacy">privacy policy</a> applies to that data.</li>
-    <li><strong>The Current</strong> (<code>www.thecurrent.org</code>) — only to read the playlist page you are already viewing. No data is sent to The Current.</li>
+    <li><strong>TIDAL</strong> (<code>openapi.tidal.com</code>, <code>auth.tidal.com</code>, <code>login.tidal.com</code>) — to authenticate and manage your playlists. <a href="https://tidal.com/privacy" target="_blank" rel="noopener">TIDAL's privacy policy</a> applies.</li>
+    <li><strong>Spotify</strong> (<code>api.spotify.com</code>, <code>accounts.spotify.com</code>) — to authenticate and manage your playlists. <a href="https://www.spotify.com/legal/privacy-policy/" target="_blank" rel="noopener">Spotify's privacy policy</a> applies.</li>
+    <li><strong>The Current</strong> (<code>www.thecurrent.org</code>) — only to read the playlist page you are already viewing in order to show the Add buttons. Nothing is sent to The Current.</li>
   </ul>
 
   <h2>Permissions</h2>
   <ul>
-    <li><code>storage</code> — to persist your Client ID and OAuth tokens locally</li>
-    <li><code>identity</code> — to open the TIDAL OAuth login window via Chrome's identity API</li>
+    <li><code>storage</code> — to persist your client ID, OAuth tokens, and settings locally.</li>
+    <li><code>identity</code> — to open the TIDAL or Spotify OAuth login window via Chrome's identity API.</li>
+    <li><strong>Host access</strong> — to the TIDAL/Spotify auth and API domains above (to log in and add songs) and to <code>thecurrent.org</code> (to add the Add buttons on the playlist page).</li>
   </ul>
 
+  <h2>Removing your data</h2>
+  <p>Log out from Settings to delete the stored tokens for a service, or remove the extension to
+  erase everything Rawk On has stored. You can also revoke Rawk On's access from your
+  <a href="https://account.tidal.com" target="_blank" rel="noopener">TIDAL account</a> or
+  <a href="https://www.spotify.com/account/apps/" target="_blank" rel="noopener">Spotify account</a> settings.</p>
+
+  <hr />
   <h2>Contact</h2>
-  <p>Questions? Open an issue on the <a href="https://github.com/ry-ops/rawk-on">GitHub repository</a>.</p>
+  <p>Questions? Open an issue on the <a href="https://github.com/ry-ops/rawk-on" target="_blank" rel="noopener">GitHub repository</a>.</p>
 </body>
 </html>
