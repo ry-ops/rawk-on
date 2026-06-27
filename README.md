@@ -5,7 +5,7 @@ On-Air Playlist to **TIDAL** or **Spotify** — one track at a time, or a whole 
 
 ![Rawk On — add a track, or a whole hour](docs/demo-vinyl.svg)
 
-A Chrome (Manifest V3) extension: hover a song card for a 🤘 **Add** song, or use
+A Chrome (Manifest V3) extension: hover a song card for a 🤘 **Add** to add a song, or use
 **Add hour** in any hour header to bulk-capture that hour into its own playlist.
 
 Manifest V3 · TypeScript · Vite · [CRXJS](https://crxjs.dev) · TIDAL & Spotify OAuth (PKCE).
