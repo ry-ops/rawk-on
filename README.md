@@ -36,7 +36,10 @@ Manifest V3 · TypeScript · Vite · [CRXJS](https://crxjs.dev) · TIDAL & Spoti
 ## Prerequisites
 
 - Node 20+ and npm
-- A developer app for whichever service(s) you want to use:
+- A **paid subscription** for whichever service(s) you want to use:
+  - **TIDAL** — any paid plan (individual, family, or student). TIDAL discontinued its free tier in April 2024, so all active accounts are paid.
+  - **Spotify** — Premium is required. The Spotify Web API blocks playlist writes (create/add tracks) for non-Premium accounts.
+- A developer app for each service:
   - TIDAL — https://developer.tidal.com
   - Spotify — https://developer.spotify.com/dashboard
 
@@ -85,6 +88,12 @@ keep working, which makes it look like an auth bug):
 
 For wider distribution you'd request an Extended Quota Mode extension; for personal
 use, the two steps above are all you need. Full walkthrough: [Connect Spotify](docs/setup-spotify.md).
+
+### TIDAL setup notes
+
+TIDAL's API requires an active paid subscription on the account you log in with.
+TIDAL eliminated its free tier in April 2024, so any valid TIDAL login is a paid
+account. Full walkthrough: [Connect TIDAL](docs/setup-tidal.md).
 
 ## Use it
 

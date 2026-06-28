@@ -4,6 +4,10 @@ Rawk On uses **your own** TIDAL developer app (free, ~5 minutes). You'll create 
 app, register a redirect URI, and paste the Client ID into the extension. No client
 secret is needed — it uses the secure PKCE flow.
 
+> **TIDAL requires a paid subscription.** TIDAL eliminated its free tier in April
+> 2024, so the account you log in with must be on an active paid plan (individual,
+> family, or student). Any valid TIDAL login today is a paid account.
+
 ## 1. Open the extension's Settings
 
 1. Click the Rawk On toolbar icon → **Settings & login**.
