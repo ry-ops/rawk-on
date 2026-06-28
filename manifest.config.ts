@@ -9,7 +9,7 @@ export default defineManifest({
   // safe; it's only needed to self-pack a .crx, not to load unpacked or publish to CWS).
   key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjxFVmrB7NFKOTEkCktLmJ6atRbQdKjbgFU2DqvnyynySHpfbxyMlK6U11fwxMPF+RLULDYfGu0fiSLNoaQWxDI1IDDnkYcAs/KgZrL1Gkv4N868KPiQmZtS9MPdt0bgpopvt257JKZSMPN+uwduRD7+M0d4Qe/aMlql3BSQuoD4jHFE8DsndEH4j6it2+nBxYpfWymbG9z5QXpKzGnP8jOLxI3vN9M7YR5o479pL31OK0Rm/3e8RQyBo8MuDhLzhIGEJv8y4T+5YzEoi0bcbfrDulKDcV4URz85/bGOUNq6rrf92ZD1a2b9m+kGZ4byZ3k0CZS+7dUMHXwDW8KDN6QIDAQAB',
   name: 'Rawk On',
-  version: '1.0.1',
+  version: '1.0.3',
   description:
     "Hover a song on The Current's playlist and add it to a daily TIDAL or Spotify playlist.",
   icons: {
