@@ -1,7 +1,7 @@
 # Chrome Web Store listing — copy & answers
 
 Ready-to-paste content for the CWS Developer Dashboard. Upload package:
-**`rawk-on-v1.1.0.zip`** (repo root). Build it with **`npm run pack`** — that runs
+**`rawk-on-v1.1.1.zip`** (repo root). Build it with **`npm run pack`** — that runs
 the build and strips the manifest `key` (the store rejects uploads containing
 `key`; we only pin it for a stable dev ID). Do **not** upload a plain
 `npm run build` zip, or you'll get *"key field is not allowed in manifest."*
@@ -120,7 +120,7 @@ https://ry-ops.dev/privacy
 - [x] **Repo public** — done (secret scan came back clean).
 - [x] **Privacy policy live** at `https://ry-ops.dev/privacy` — verified; includes a
       "Rawk On (browser extension)" section.
-- [x] **Package** — `rawk-on-v1.1.0.zip` built with `npm run pack` (no manifest `key`).
+- [x] **Package** — `rawk-on-v1.1.1.zip` built with `npm run pack` (no manifest `key`).
 - [x] **Screenshots** — two 1280×800 24-bit PNGs (no alpha) in `docs/store/`
       (`screenshot-1`, `screenshot-2`).
 - [x] **Store icon** — `docs/store/store-icon-128.png` (128×128).

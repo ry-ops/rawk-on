@@ -25,9 +25,13 @@ export const SELECTORS = {
   // The per-song link, e.g. /song/the-current/86497 — the trailing number is
   // The Current's song_id (also present in the JSON API).
   songLink: ['a[href*="/song/"]'],
-  // Hour-block header. Direct child of .playlist-hours so it doesn't match the
-  // h4.playlist-title inside each card. Its next <ul> sibling holds the songs.
-  hourHeader: ['.playlist-hours > h4'],
+  // Hour-block header. Direct child of the hour-list wrapper so it doesn't
+  // match the h4.playlist-title inside each card. Its next <ul> sibling holds
+  // the songs. thecurrent.org uses a plain `.playlist-hours` class; Carbon
+  // Sound's Next.js build CSS-modules-hashes it to something like
+  // `PlaylistPage-module__xxxxx__playlistHours`, so fall back to a
+  // substring match on the human-readable part of that hashed class.
+  hourHeader: ['.playlist-hours > h4', '[class*="playlistHours"] > h4'],
   // The "9 AM–10 AM" label inside an hour header.
   hourLabel: ['cite', 'cite.type-hefty'],
 } as const
