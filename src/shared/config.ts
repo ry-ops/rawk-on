@@ -47,9 +47,14 @@ export const SPOTIFY = {
 // most likely thing to need adjusting.
 export const DEBUG = false
 
-// Playlist naming: "The Current - 2026-06-21"
-export function dailyPlaylistName(isoDate: string): string {
-  return `The Current - ${isoDate}`
+// Playlist naming: "Radio Heartland - 2026-06-21"
+export function dailyPlaylistName(isoDate: string, streamLabel: string): string {
+  return `${streamLabel} - ${isoDate}`
+}
+
+// Hour-block playlist naming: "Radio Heartland - 2026-06-21 · 9 AM-10 AM"
+export function hourPlaylistName(streamLabel: string, isoDate: string, hourLabel: string): string {
+  return `${streamLabel} - ${isoDate} · ${hourLabel}`
 }
 
 // Local date (not UTC) as YYYY-MM-DD, so the playlist matches the listener's day.

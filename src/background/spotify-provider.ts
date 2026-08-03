@@ -1,7 +1,7 @@
-import { SPOTIFY, DEBUG, dailyPlaylistName, localISODate } from '../shared/config.ts'
+import { SPOTIFY, DEBUG, dailyPlaylistName, hourPlaylistName, localISODate } from '../shared/config.ts'
 import { getSettings } from '../shared/settings.ts'
 import { bestMatch, type ScoredCandidate } from '../shared/match.ts'
-import type { TrackInfo, Tokens, AddTrackResult, AddHourResult, SearchDebugResult } from '../shared/types.ts'
+import type { TrackInfo, Tokens, AddTrackResult, AddHourResult, SearchDebugResult, StreamInfo } from '../shared/types.ts'
 import { getTokens, setTokens, clearTokens, getDaily, setDaily, dropDaily, recordAddedTrack, recordAddedTracks, type DailyPlaylist } from './storage.ts'
 import type { MusicProvider } from './provider.ts'
 
@@ -225,20 +225,20 @@ export class SpotifyProvider implements MusicProvider {
 
   // ── Playlist ops ──────────────────────────────────────────────────────────
 
-  private async createPlaylist(name: string): Promise<string> {
+  private async createPlaylist(name: string, streamLabel: string): Promise<string> {
     // Spotify deprecated POST /users/{id}/playlists (now returns 403); /me/playlists is the current endpoint.
     const res = await this.api<{ id: string }>(`/me/playlists`, {
       method: 'POST',
-      body: JSON.stringify({ name, description: 'Captured from The Current via Rawk On.', public: false }),
+      body: JSON.stringify({ name, description: `Captured from ${streamLabel} via Rawk On.`, public: false }),
     })
     if (!res.id) throw new Error('Playlist creation returned no id.')
     return res.id
   }
 
-  private async ensurePlaylist(cacheKey: string, name: string): Promise<DailyPlaylist> {
+  private async ensurePlaylist(cacheKey: string, name: string, streamLabel: string): Promise<DailyPlaylist> {
     const existing = await getDaily(cacheKey)
     if (existing) return existing
-    const id = await this.createPlaylist(name)
+    const id = await this.createPlaylist(name, streamLabel)
     await setDaily(cacheKey, id, [])
     return { id, trackIds: [] }
   }
@@ -254,14 +254,14 @@ export class SpotifyProvider implements MusicProvider {
     }
   }
 
-  private async addWithRecreate(cacheKey: string, name: string, daily: DailyPlaylist, trackIds: string[]): Promise<string> {
+  private async addWithRecreate(cacheKey: string, name: string, streamLabel: string, daily: DailyPlaylist, trackIds: string[]): Promise<string> {
     try {
       await this.addItems(daily.id, trackIds)
       return daily.id
     } catch (err) {
       if (err instanceof ApiError && err.status === 404) {
         await dropDaily(cacheKey)
-        const id = await this.createPlaylist(name)
+        const id = await this.createPlaylist(name, streamLabel)
         await setDaily(cacheKey, id, [])
         await this.addItems(id, trackIds)
         return id
@@ -276,14 +276,14 @@ export class SpotifyProvider implements MusicProvider {
 
   // ── Public entry points ───────────────────────────────────────────────────
 
-  async addTrack(track: TrackInfo): Promise<AddTrackResult> {
+  async addTrack(track: TrackInfo, stream: StreamInfo): Promise<AddTrackResult> {
     const t0 = performance.now()
     try {
       const isoDate = localISODate(new Date())
-      const cacheKey = `${this.id}·${isoDate}` // provider-scoped so Spotify/Tidal don't share playlist ids
+      const cacheKey = `${this.id}·${stream.slug}·${isoDate}` // provider- and stream-scoped so streams/services never share a playlist
       const [[match, msSearch], [daily, msEnsure]] = await Promise.all([
         timed(() => this.searchTrackId(track)),
-        timed(() => this.ensurePlaylist(cacheKey, dailyPlaylistName(isoDate))),
+        timed(() => this.ensurePlaylist(cacheKey, dailyPlaylistName(isoDate, stream.label), stream.label)),
       ])
 
       if (!match) return { ok: false, error: `No Spotify match for "${track.artist} – ${track.title}".` }
@@ -293,7 +293,7 @@ export class SpotifyProvider implements MusicProvider {
         return { ok: true, status: 'duplicate', playlistId: daily.id, playlistUrl: this.playlistUrl(daily.id), matched: track, matchedTitle: match.title, ms: Math.round(performance.now() - t0) }
       }
 
-      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(cacheKey, dailyPlaylistName(isoDate), daily, [match.id]))
+      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(cacheKey, dailyPlaylistName(isoDate, stream.label), stream.label, daily, [match.id]))
       await recordAddedTrack(cacheKey, match.id)
 
       if (DEBUG) console.log(`[rawk-on/spotify] timing search=${Math.round(msSearch)}ms ensure=${Math.round(msEnsure)}ms add=${Math.round(msAdd)}ms`)
@@ -303,12 +303,12 @@ export class SpotifyProvider implements MusicProvider {
     }
   }
 
-  async addHour(date: string, hourLabel: string, tracks: TrackInfo[]): Promise<AddHourResult> {
+  async addHour(date: string, hourLabel: string, tracks: TrackInfo[], stream: StreamInfo): Promise<AddHourResult> {
     const t0 = performance.now()
     try {
-      const cacheKey = `${this.id}·${date}·${hourLabel}` // provider-scoped
-      const name = `The Current - ${date} · ${hourLabel}`
-      const daily = await this.ensurePlaylist(cacheKey, name)
+      const cacheKey = `${this.id}·${stream.slug}·${date}·${hourLabel}` // provider- and stream-scoped
+      const name = hourPlaylistName(stream.label, date, hourLabel)
+      const daily = await this.ensurePlaylist(cacheKey, name, stream.label)
       const seen = new Set(daily.trackIds)
 
       const matches = await mapLimit(tracks, 3, async (tr) => ({ tr, id: (await this.searchTrackId(tr))?.id ?? null }))
@@ -323,7 +323,7 @@ export class SpotifyProvider implements MusicProvider {
       }
 
       if (toAdd.length) {
-        await this.addWithRecreate(cacheKey, name, daily, toAdd)
+        await this.addWithRecreate(cacheKey, name, stream.label, daily, toAdd)
         await recordAddedTracks(cacheKey, toAdd)
       }
 

@@ -27,7 +27,7 @@ async function handle(msg: Message): Promise<Response> {
   switch (msg.type) {
     case 'ADD_TRACK': {
       const p = await getProvider()
-      return p.addTrack(msg.track)
+      return p.addTrack(msg.track, msg.stream)
     }
 
     case 'GET_AUTH_STATE': {
@@ -63,7 +63,7 @@ async function handle(msg: Message): Promise<Response> {
 
     case 'ADD_HOUR': {
       const p = await getProvider()
-      return p.addHour(msg.date, msg.hourLabel, msg.tracks)
+      return p.addHour(msg.date, msg.hourLabel, msg.tracks, msg.stream)
     }
 
     case 'CLEAR_CACHE': {

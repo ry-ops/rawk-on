@@ -13,9 +13,15 @@ import {
 } from './ui.ts'
 import { localISODate } from '../shared/config.ts'
 import { getSettings } from '../shared/settings.ts'
+import { detectStream, type StreamInfo } from '../shared/streams.ts'
 
 const MARK = 'tpWired' // dataset flag so we never double-wire a row
 const HOUR_MARK = 'tpHourWired'
+
+// Which of The Current's (or Carbon Sound's) streams this page belongs to —
+// determines which daily playlist songs land in. Falls back to "The Current"
+// so an unrecognized URL still behaves like the extension always did.
+const STREAM: StreamInfo = detectStream(new URL(location.href)) ?? { slug: 'the-current', label: 'The Current' }
 
 function send(msg: Message): Promise<AddTrackResult> {
   return chrome.runtime.sendMessage(msg) as Promise<AddTrackResult>
@@ -50,7 +56,7 @@ async function handleAdd(row: HTMLElement, btn: HTMLButtonElement): Promise<void
   setButtonState(btn, 'loading')
   let res: AddTrackResult
   try {
-    res = await send({ type: 'ADD_TRACK', track })
+    res = await send({ type: 'ADD_TRACK', track, stream: STREAM })
   } catch (err) {
     setButtonState(btn, 'error')
     const msg = err instanceof Error ? err.message : String(err)
@@ -154,6 +160,7 @@ async function handleAddHour(
       date: pageDate(),
       hourLabel,
       tracks,
+      stream: STREAM,
     })) as AddHourResult
   } catch (err) {
     setHourButtonState(btn, 'error', 'Retry')

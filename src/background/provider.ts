@@ -1,4 +1,4 @@
-import type { TrackInfo, AddTrackResult, AddHourResult, SearchDebugResult } from '../shared/types.ts'
+import type { TrackInfo, AddTrackResult, AddHourResult, SearchDebugResult, StreamInfo } from '../shared/types.ts'
 
 export interface MusicProvider {
   readonly id: 'tidal' | 'spotify'
@@ -11,7 +11,7 @@ export interface MusicProvider {
   redirectUri(): string
 
   // Music ops
-  addTrack(track: TrackInfo): Promise<AddTrackResult>
-  addHour(date: string, hourLabel: string, tracks: TrackInfo[]): Promise<AddHourResult>
+  addTrack(track: TrackInfo, stream: StreamInfo): Promise<AddTrackResult>
+  addHour(date: string, hourLabel: string, tracks: TrackInfo[], stream: StreamInfo): Promise<AddHourResult>
   searchDebug(query: string): Promise<SearchDebugResult>
 }

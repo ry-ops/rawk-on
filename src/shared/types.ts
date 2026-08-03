@@ -1,3 +1,6 @@
+export type { StreamInfo } from './streams.ts'
+import type { StreamInfo } from './streams.ts'
+
 export interface TrackInfo {
   title: string
   artist: string
@@ -26,13 +29,13 @@ export interface AuthState {
 // ── Messages: content/popup → background ────────────────────────────────────
 
 export type Message =
-  | { type: 'ADD_TRACK'; track: TrackInfo }
+  | { type: 'ADD_TRACK'; track: TrackInfo; stream: StreamInfo }
   | { type: 'GET_AUTH_STATE' }
   | { type: 'LOGIN' }
   | { type: 'LOGOUT' }
   | { type: 'GET_REDIRECT_URI' }
   | { type: 'SEARCH_DEBUG'; query: string }
-  | { type: 'ADD_HOUR'; date: string; hourLabel: string; tracks: TrackInfo[] }
+  | { type: 'ADD_HOUR'; date: string; hourLabel: string; tracks: TrackInfo[]; stream: StreamInfo }
   | { type: 'CLEAR_CACHE'; provider: 'tidal' | 'spotify' }
 
 export interface SearchHit {

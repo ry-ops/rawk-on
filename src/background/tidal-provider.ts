@@ -1,7 +1,7 @@
-import { TIDAL, DEBUG, dailyPlaylistName, localISODate } from '../shared/config.ts'
+import { TIDAL, DEBUG, dailyPlaylistName, hourPlaylistName, localISODate } from '../shared/config.ts'
 import { getSettings } from '../shared/settings.ts'
 import { bestMatch, titleScore, type ScoredCandidate } from '../shared/match.ts'
-import type { TrackInfo, Tokens, AddTrackResult, AddHourResult, SearchDebugResult } from '../shared/types.ts'
+import type { TrackInfo, Tokens, AddTrackResult, AddHourResult, SearchDebugResult, StreamInfo } from '../shared/types.ts'
 import { getTokens, setTokens, clearTokens, getDaily, setDaily, dropDaily, recordAddedTrack, recordAddedTracks, type DailyPlaylist } from './storage.ts'
 import type { MusicProvider } from './provider.ts'
 
@@ -63,6 +63,54 @@ async function challengeFor(verifier: string): Promise<string> {
   return base64UrlEncode(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)))
 }
 
+// ── Tab-based authorize ───────────────────────────────────────────────────────
+//
+// TIDAL gates login.tidal.com/authorize behind DataDome bot protection, which
+// returns 403 inside chrome.identity.launchWebAuthFlow's isolated popup (no real
+// cookies, can't run the JS challenge) → "Authorization page could not be loaded."
+//
+// So we open the authorize page in a NORMAL tab instead: it carries the user's
+// real TIDAL/DataDome cookies and can run the challenge, then we intercept the
+// redirect to the chromiumapp.org URI (which never actually loads) via
+// webNavigation.onBeforeNavigate to capture the auth code, and close the tab.
+function authorizeViaTab(authUrl: string, redirectPrefix: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    let settled = false
+    let authTabId: number | undefined
+
+    const filter = { url: [{ urlPrefix: redirectPrefix }] }
+
+    const finish = (run: () => void): void => {
+      if (settled) return
+      settled = true
+      chrome.webNavigation.onBeforeNavigate.removeListener(onNavigate)
+      chrome.webNavigation.onCommitted.removeListener(onNavigate)
+      chrome.tabs.onRemoved.removeListener(onRemoved)
+      if (authTabId !== undefined) void chrome.tabs.remove(authTabId).catch(() => {})
+      run()
+    }
+
+    const onNavigate = (details: { tabId: number; frameId: number; url: string }): void => {
+      if (details.frameId !== 0) return // top frame only
+      if (authTabId !== undefined && details.tabId !== authTabId) return
+      if (!details.url.startsWith(redirectPrefix)) return
+      finish(() => resolve(details.url))
+    }
+
+    const onRemoved = (tabId: number): void => {
+      if (tabId === authTabId) finish(() => reject(new Error('Login was cancelled.')))
+    }
+
+    chrome.webNavigation.onBeforeNavigate.addListener(onNavigate, filter)
+    chrome.webNavigation.onCommitted.addListener(onNavigate, filter)
+    chrome.tabs.onRemoved.addListener(onRemoved)
+
+    chrome.tabs.create({ url: authUrl, active: true })
+      .then((tab) => { authTabId = tab.id })
+      .catch((err) => finish(() => reject(err instanceof Error ? err : new Error(String(err)))))
+  })
+}
+
 // ── TidalProvider ────────────────────────────────────────────────────────────
 
 export class TidalProvider implements MusicProvider {
@@ -93,7 +141,8 @@ export class TidalProvider implements MusicProvider {
 
     if (DEBUG) console.log('[rawk-on] tidal auth url', authUrl.toString())
 
-    const responseUrl = await chrome.identity.launchWebAuthFlow({ url: authUrl.toString(), interactive: true })
+    // Normal tab (not launchWebAuthFlow) so DataDome's bot challenge can clear.
+    const responseUrl = await authorizeViaTab(authUrl.toString(), redirect)
     if (!responseUrl) throw new Error('Login was cancelled.')
 
     const returned = new URL(responseUrl)
@@ -241,20 +290,20 @@ export class TidalProvider implements MusicProvider {
 
   // ── Playlist ops ──────────────────────────────────────────────────────────
 
-  private async createPlaylist(name: string): Promise<string> {
+  private async createPlaylist(name: string, streamLabel: string): Promise<string> {
     const doc = await this.api('/playlists', {
       method: 'POST',
-      body: JSON.stringify({ data: { type: 'playlists', attributes: { name, description: 'Captured from The Current via Rawk On.', accessType: 'UNLISTED' } } }),
+      body: JSON.stringify({ data: { type: 'playlists', attributes: { name, description: `Captured from ${streamLabel} via Rawk On.`, accessType: 'UNLISTED' } } }),
     })
     const created = Array.isArray(doc.data) ? doc.data[0] : doc.data
     if (!created?.id) throw new Error('Playlist creation returned no id.')
     return created.id
   }
 
-  private async ensurePlaylist(cacheKey: string, name: string): Promise<DailyPlaylist> {
+  private async ensurePlaylist(cacheKey: string, name: string, streamLabel: string): Promise<DailyPlaylist> {
     const existing = await getDaily(cacheKey)
     if (existing) return existing
-    const id = await this.createPlaylist(name)
+    const id = await this.createPlaylist(name, streamLabel)
     await setDaily(cacheKey, id, [])
     return { id, trackIds: [] }
   }
@@ -269,14 +318,14 @@ export class TidalProvider implements MusicProvider {
     }
   }
 
-  private async addWithRecreate(cacheKey: string, name: string, daily: DailyPlaylist, trackIds: string[]): Promise<string> {
+  private async addWithRecreate(cacheKey: string, name: string, streamLabel: string, daily: DailyPlaylist, trackIds: string[]): Promise<string> {
     try {
       await this.addItems(daily.id, trackIds)
       return daily.id
     } catch (err) {
       if (err instanceof ApiError && err.status === 404) {
         await dropDaily(cacheKey)
-        const id = await this.createPlaylist(name)
+        const id = await this.createPlaylist(name, streamLabel)
         await setDaily(cacheKey, id, [])
         await this.addItems(id, trackIds)
         return id
@@ -291,14 +340,14 @@ export class TidalProvider implements MusicProvider {
 
   // ── Public entry points ───────────────────────────────────────────────────
 
-  async addTrack(track: TrackInfo): Promise<AddTrackResult> {
+  async addTrack(track: TrackInfo, stream: StreamInfo): Promise<AddTrackResult> {
     const t0 = performance.now()
     try {
       const isoDate = localISODate(new Date())
-      const cacheKey = `${this.id}·${isoDate}` // provider-scoped so Spotify/Tidal don't share playlist ids
+      const cacheKey = `${this.id}·${stream.slug}·${isoDate}` // provider- and stream-scoped so streams/services never share a playlist
       const [[match, msSearch], [daily, msEnsure]] = await Promise.all([
         timed(() => this.searchTrackId(track)),
-        timed(() => this.ensurePlaylist(cacheKey, dailyPlaylistName(isoDate))),
+        timed(() => this.ensurePlaylist(cacheKey, dailyPlaylistName(isoDate, stream.label), stream.label)),
       ])
 
       if (!match) return { ok: false, error: `No TIDAL match for "${track.artist} – ${track.title}".` }
@@ -308,7 +357,7 @@ export class TidalProvider implements MusicProvider {
         return { ok: true, status: 'duplicate', playlistId: daily.id, playlistUrl: this.playlistUrl(daily.id), matched: track, matchedTitle: match.title, ms: Math.round(performance.now() - t0) }
       }
 
-      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(cacheKey, dailyPlaylistName(isoDate), daily, [match.id]))
+      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(cacheKey, dailyPlaylistName(isoDate, stream.label), stream.label, daily, [match.id]))
       await recordAddedTrack(cacheKey, match.id)
 
       if (DEBUG) console.log(`[rawk-on/tidal] timing search=${Math.round(msSearch)}ms ensure=${Math.round(msEnsure)}ms add=${Math.round(msAdd)}ms`)
@@ -318,12 +367,12 @@ export class TidalProvider implements MusicProvider {
     }
   }
 
-  async addHour(date: string, hourLabel: string, tracks: TrackInfo[]): Promise<AddHourResult> {
+  async addHour(date: string, hourLabel: string, tracks: TrackInfo[], stream: StreamInfo): Promise<AddHourResult> {
     const t0 = performance.now()
     try {
-      const cacheKey = `${this.id}·${date}·${hourLabel}` // provider-scoped
-      const name = `The Current - ${date} · ${hourLabel}`
-      const daily = await this.ensurePlaylist(cacheKey, name)
+      const cacheKey = `${this.id}·${stream.slug}·${date}·${hourLabel}` // provider- and stream-scoped
+      const name = hourPlaylistName(stream.label, date, hourLabel)
+      const daily = await this.ensurePlaylist(cacheKey, name, stream.label)
       const seen = new Set(daily.trackIds)
 
       const matches = await mapLimit(tracks, 2, async (tr) => ({ tr, id: (await this.searchTrackId(tr))?.id ?? null }))
@@ -338,7 +387,7 @@ export class TidalProvider implements MusicProvider {
       }
 
       if (toAdd.length) {
-        await this.addWithRecreate(cacheKey, name, daily, toAdd)
+        await this.addWithRecreate(cacheKey, name, stream.label, daily, toAdd)
         await recordAddedTracks(cacheKey, toAdd)
       }
 

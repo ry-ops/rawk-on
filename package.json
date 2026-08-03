@@ -1,7 +1,7 @@
 {
   "name": "rawk-on",
-  "version": "1.0.3",
-  "description": "Hover a song on The Current's playlist and add it to a daily TIDAL or Spotify playlist.",
+  "version": "1.1.0",
+  "description": "Hover a song on any of The Current's streams (or Carbon Sound) and add it to a daily TIDAL or Spotify playlist.",
   "type": "module",
   "scripts": {
     "dev": "vite",
