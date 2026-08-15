@@ -162,3 +162,35 @@ To publish:
 **Metal Hand** icon by **Berkah Icon** from the
 [Noun Project](https://thenounproject.com/icon/metal-hand-1200426/) (#1200426, CC BY).
 The same attribution is included in the Chrome Web Store listing.
+
+## Changelog
+
+### v1.1.2
+- **Fixed TIDAL search** — TIDAL retired the `GET /searchResults/{query}` endpoint
+  (the free-text-query-as-path-parameter approach), which broke every track match
+  with `400 INVALID_RESOURCE_ID`. Search now uses the current
+  `GET /searchSuggestions?filter[query]=...&include=directHits` endpoint.
+- **Fixed stream misdetection** — thecurrent.org is a Next.js site with
+  client-side routing, so navigating between stream pages (e.g. The Current →
+  Radio Heartland) via in-page links never reloaded the content script. The
+  active stream is now re-detected from the live URL on every add, instead of
+  being cached once at page load.
+- Add-track failures now log full details (including the matched TIDAL track
+  ID/title) to the page console, not just a 5-second toast — makes future
+  API-shape regressions easier to diagnose.
+
+### v1.1.1
+- Fixed "Add hour" button not appearing on Carbon Sound.
+
+### v1.1.0
+- **Multi-stream support** — The Current's full stream family (Radio Heartland,
+  The Current's Pride Stream, The Siren, Purple Current, Local Current, etc.)
+  plus Carbon Sound, each scoped to its own daily playlist.
+- **Tab-based TIDAL login** — TIDAL's login page is gated by DataDome bot
+  protection, which blocked `chrome.identity.launchWebAuthFlow`'s isolated
+  popup. Login now opens in a normal tab (carrying real cookies) and the
+  extension intercepts the OAuth redirect via `webNavigation`.
+
+### v1.0.3 and earlier
+- Initial TIDAL + Spotify support, paid-subscription requirement docs, base
+  single-stream (The Current) capture.
