@@ -21,7 +21,11 @@ const HOUR_MARK = 'tpHourWired'
 // Which of The Current's (or Carbon Sound's) streams this page belongs to —
 // determines which daily playlist songs land in. Falls back to "The Current"
 // so an unrecognized URL still behaves like the extension always did.
-const STREAM: StreamInfo = detectStream(new URL(location.href)) ?? { slug: 'the-current', label: 'The Current' }
+// Re-detected on every call (not cached) since the streams page is client-side
+// routed — switching streams via in-page nav doesn't reload the content script.
+function currentStream(): StreamInfo {
+  return detectStream(new URL(location.href)) ?? { slug: 'the-current', label: 'The Current' }
+}
 
 function send(msg: Message): Promise<AddTrackResult> {
   return chrome.runtime.sendMessage(msg) as Promise<AddTrackResult>
@@ -56,7 +60,7 @@ async function handleAdd(row: HTMLElement, btn: HTMLButtonElement): Promise<void
   setButtonState(btn, 'loading')
   let res: AddTrackResult
   try {
-    res = await send({ type: 'ADD_TRACK', track, stream: STREAM })
+    res = await send({ type: 'ADD_TRACK', track, stream: currentStream() })
   } catch (err) {
     setButtonState(btn, 'error')
     const msg = err instanceof Error ? err.message : String(err)
@@ -103,6 +107,7 @@ async function handleAdd(row: HTMLElement, btn: HTMLButtonElement): Promise<void
     toast(`Not connected to ${getServiceLabel()}. Open the extension settings to log in.`, 'bad', 5000)
   } else if (!res.ok) {
     setButtonState(btn, 'error')
+    console.error(`[rawk-on] add failed for "${track.artist} – ${track.title}":`, res.error)
     toast(`Couldn’t add: ${res.error}`, 'bad', 5000)
   }
 }
@@ -160,7 +165,7 @@ async function handleAddHour(
       date: pageDate(),
       hourLabel,
       tracks,
-      stream: STREAM,
+      stream: currentStream(),
     })) as AddHourResult
   } catch (err) {
     setHourButtonState(btn, 'error', 'Retry')

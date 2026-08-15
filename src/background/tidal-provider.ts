@@ -258,12 +258,14 @@ export class TidalProvider implements MusicProvider {
 
   private async searchTrackId(track: TrackInfo): Promise<{ id: string; title?: string } | null> {
     const query = `${track.artist} ${track.title}`.trim()
-    const doc = await this.api(`/searchResults/${encodeURIComponent(query)}`, {
-      query: { include: 'tracks,tracks.artists,tracks.albums' },
+    // /searchResults/{id} (query-as-path-param) was retired by TIDAL — searchSuggestions'
+    // directHits relationship is the current replacement for resolving a free-text query.
+    const doc = await this.api('/searchSuggestions', {
+      query: { 'filter[query]': query, include: 'directHits,directHits.artists,directHits.albums' },
     })
 
     const data = Array.isArray(doc.data) ? doc.data[0] : doc.data
-    const rel = data?.relationships?.tracks?.data
+    const rel = data?.relationships?.directHits?.data
     const ranked = (Array.isArray(rel) ? rel : rel ? [rel] : []).filter((r) => r.type === 'tracks')
 
     const included = doc.included ?? []
@@ -357,7 +359,13 @@ export class TidalProvider implements MusicProvider {
         return { ok: true, status: 'duplicate', playlistId: daily.id, playlistUrl: this.playlistUrl(daily.id), matched: track, matchedTitle: match.title, ms: Math.round(performance.now() - t0) }
       }
 
-      const [playlistId, msAdd] = await timed(() => this.addWithRecreate(cacheKey, dailyPlaylistName(isoDate, stream.label), stream.label, daily, [match.id]))
+      let playlistId: string, msAdd: number
+      try {
+        ;[playlistId, msAdd] = await timed(() => this.addWithRecreate(cacheKey, dailyPlaylistName(isoDate, stream.label), stream.label, daily, [match.id]))
+      } catch (err) {
+        if (err instanceof ApiError) throw new ApiError(err.status, `${err.message} — matched TIDAL track ${match.id} "${match.title ?? '?'}" for "${track.artist} – ${track.title}"`)
+        throw err
+      }
       await recordAddedTrack(cacheKey, match.id)
 
       if (DEBUG) console.log(`[rawk-on/tidal] timing search=${Math.round(msSearch)}ms ensure=${Math.round(msEnsure)}ms add=${Math.round(msAdd)}ms`)
@@ -401,11 +409,11 @@ export class TidalProvider implements MusicProvider {
 
   async searchDebug(query: string): Promise<SearchDebugResult> {
     try {
-      const doc = await this.api(`/searchResults/${encodeURIComponent(query.trim())}`, {
-        query: { include: 'tracks,tracks.artists,tracks.albums' },
+      const doc = await this.api('/searchSuggestions', {
+        query: { 'filter[query]': query.trim(), include: 'directHits,directHits.artists,directHits.albums' },
       })
       const data = Array.isArray(doc.data) ? doc.data[0] : doc.data
-      const rel = data?.relationships?.tracks?.data
+      const rel = data?.relationships?.directHits?.data
       const ranked = (Array.isArray(rel) ? rel : rel ? [rel] : []).filter((r) => r.type === 'tracks')
       const included = doc.included ?? []
       const trackById = new Map(included.filter((r) => r.type === 'tracks').map((r) => [r.id, r]))
