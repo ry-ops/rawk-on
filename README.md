@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/banner.svg" alt="rawk-on: The Current's on-air playlist into daily TIDAL or Spotify lists" width="100%"></p>
+
 # 🤘 Rawk On
 
 Add songs from [The Current](https://www.thecurrent.org/playlist/the-current)'s
@@ -194,3 +196,8 @@ The same attribution is included in the Chrome Web Store listing.
 ### v1.0.3 and earlier
 - Initial TIDAL + Spotify support, paid-subscription requirement docs, base
   single-stream (The Current) capture.
+
+<!-- org-footer -->
+---
+
+<p align="center"><sub>Part of <a href="https://github.com/ry-ops">ry-ops</a> · building the pipes between infrastructure, automation, and observability · built by <a href="https://github.com/ry-ops">ry-ops</a></sub></p>
