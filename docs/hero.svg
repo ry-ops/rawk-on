@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-labelledby="t d">
+  <title id="t">Rawk On: add songs from The Current to TIDAL or Spotify</title>
+  <desc id="d">Hover a song card on The Current's on-air playlist and click the horns Add button; the extension searches your chosen service, matches on title plus artist plus album, and files the track in a daily playlist — or bulk-adds a whole hour block at once.</desc>
+  <defs>
+    <linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="#ff2d55"/><stop offset=".5" stop-color="#ff7a3d"/><stop offset="1" stop-color="#ffc13d"/></linearGradient>
+    <radialGradient id="disc" cx="148" cy="232" r="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2a2a30"/><stop offset=".42" stop-color="#111114"/><stop offset=".46" stop-color="#2a2a30"/><stop offset="1" stop-color="#0a0a0c"/></radialGradient>
+  </defs>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill:#f2eef0; }
+    .muted { fill:#9a929c; } .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes hov { 0%,3.00% { opacity:0 } 7.00%,27.00% { opacity:1 } 30.00%,100% { opacity:0 } } .hov { animation:hov 10.0s infinite; }
+    @keyframes srch { 0%,26.00% { opacity:0 } 30.00%,51.00% { opacity:1 } 54.00%,100% { opacity:0 } } .srch { animation:srch 10.0s infinite; }
+    @keyframes add { 0%,50.00% { opacity:0 } 54.00%,75.00% { opacity:1 } 78.00%,100% { opacity:0 } } .add { animation:add 10.0s infinite; }
+    @keyframes hour { 0%,74.00% { opacity:0 } 78.00%,95.00% { opacity:1 } 98.00%,100% { opacity:0 } } .hour { animation:hour 10.0s infinite; }
+    @keyframes spin { from { transform:rotate(0) } to { transform:rotate(360deg) } } .vinyl { transform-origin:148px 232px; animation: spin 6s linear infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; opacity:1 !important; } .vinyl{animation:none} }
+  </style>
+  <rect width="960" height="400" rx="20" fill="#120d12"/>
+  <text x="40" y="54" font-size="30" font-weight="800" style="fill:url(#title)">🤘 Rawk On</text>
+  <text x="42" y="82" font-size="15" class="muted">The Current's on-air playlist → a daily <tspan style="fill:#f2eef0">TIDAL</tspan> or <tspan style="fill:#1ed760">Spotify</tspan> playlist, one track or a whole hour.</text>
+
+  <!-- vinyl -->
+  <circle class="vinyl" cx="148" cy="232" r="56" fill="url(#disc)"/>
+  <circle cx="148" cy="232" r="8" fill="#ff2d55"/>
+  <circle cx="148" cy="232" r="2.5" fill="#120d12"/>
+  <text x="148" y="316" text-anchor="middle" font-size="11" class="muted">thecurrent.org</text>
+
+  <!-- step cards on the right -->
+  <g class="hov"><rect x="250" y="120" width="670" height="56" rx="12" fill="#1c141a" stroke="#ff2d55" stroke-opacity=".5"/>
+    <text x="270" y="146" font-size="13.5" font-weight="700">Hover a song card</text>
+    <text x="270" y="165" font-size="11.5" class="muted">“Flume — Never Be Like You” · 9:14 AM</text>
+    <rect x="800" y="134" width="100" height="28" rx="14" fill="#ff2d55"/><text x="850" y="153" text-anchor="middle" font-size="12.5" font-weight="800">🤘 Add</text></g>
+
+  <g class="srch"><rect x="250" y="186" width="670" height="56" rx="12" fill="#13181f" stroke="#2a3443"/>
+    <text x="270" y="212" font-size="13.5" font-weight="700" style="fill:#9fd6ff">Match the right track</text>
+    <text x="270" y="231" font-size="11.5" class="muted">scored on title + artist + album — no title match? it adds nothing, not the wrong song</text></g>
+
+  <g class="add"><rect x="250" y="252" width="670" height="56" rx="12" fill="#13201a" stroke="#1ed760" stroke-opacity=".5"/>
+    <text x="270" y="278" font-size="13.5" font-weight="700" style="fill:#7ee6a0">✓ Added &amp; de-duped</text>
+    <text x="270" y="297" font-size="11.5" class="mono muted">The Current - 2026-10-05</text></g>
+
+  <g class="hour"><rect x="250" y="318" width="670" height="50" rx="12" fill="#201a12" stroke="#ffc13d" stroke-opacity=".5"/>
+    <text x="270" y="342" font-size="13.5" font-weight="700" style="fill:#ffd87a">Or grab a whole hour</text>
+    <text x="270" y="360" font-size="11.5" class="mono muted">The Current - 2026-10-05 · 9 AM–10 AM</text></g>
+</svg>
