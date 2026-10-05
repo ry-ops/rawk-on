@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-labelledby="t d">
+  <title id="t">Rawk On architecture</title>
+  <desc id="d">A content script on thecurrent.org extracts song cards and shows Add buttons; it messages the MV3 service worker, which routes to the active provider — TIDAL (JSON:API) or Spotify (REST) — each handling PKCE auth, search, scoring and playlist writes. Tokens and the daily-playlist cache live per-provider in chrome.storage.local.</desc>
+  <defs><linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="#ff2d55"/><stop offset="1" stop-color="#ffc13d"/></linearGradient></defs>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill:#f2eef0; }
+    .muted { fill:#9a929c; } .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes c0 { 0%,2.22% { opacity:0; transform:translateY(10px) } 8.89%,100% { opacity:1; transform:translateY(0) } } .c0 { animation:c0 9.0s infinite; }
+    @keyframes c1 { 0%,7.78% { opacity:0; transform:translateY(10px) } 14.44%,100% { opacity:1; transform:translateY(0) } } .c1 { animation:c1 9.0s infinite; }
+    @keyframes c2 { 0%,13.33% { opacity:0; transform:translateY(10px) } 20.00%,100% { opacity:1; transform:translateY(0) } } .c2 { animation:c2 9.0s infinite; }
+    @keyframes c3 { 0%,18.89% { opacity:0; transform:translateY(10px) } 25.56%,100% { opacity:1; transform:translateY(0) } } .c3 { animation:c3 9.0s infinite; }
+    @keyframes fl { 0% { stroke-dashoffset:26 } 100% { stroke-dashoffset:0 } } .fl { stroke-dasharray:5 6; animation: fl 1s linear infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; opacity:1 !important; transform:none !important; } }
+  </style>
+  <rect width="960" height="400" rx="20" fill="#120d12"/>
+  <text x="40" y="50" font-size="26" font-weight="800" style="fill:url(#title)">Inside the extension</text>
+  <text x="42" y="76" font-size="14" class="muted">Manifest V3 · TypeScript · Vite · CRXJS · one <tspan class="mono">MusicProvider</tspan> interface, two backends.</text>
+
+  <line class="fl" x1="250" y1="158" x2="340" y2="158" stroke="#3a3440" stroke-width="2"/>
+  <line class="fl" x1="610" y1="158" x2="700" y2="158" stroke="#3a3440" stroke-width="2"/>
+
+  <!-- content script -->
+  <g class="c0"><rect x="40" y="98" width="210" height="140" rx="12" fill="#1c141a" stroke="#ff7a3d" stroke-opacity=".5"/>
+  <text x="60" y="124" font-size="14" font-weight="800" style="fill:#ffab7a">content script</text>
+  <text x="60" y="143" font-size="10.5" class="muted">on thecurrent.org</text>
+  <text x="60" y="167" font-size="11" class="muted">· selectors.ts ⭐</text>
+  <text x="60" y="187" font-size="11" class="muted">· extract card → song</text>
+  <text x="60" y="207" font-size="11" class="muted">· 🤘 Add / Add-hour pills</text>
+  <text x="60" y="227" font-size="11" class="muted">· toasts</text></g>
+
+  <!-- service worker -->
+  <g class="c1"><rect x="340" y="112" width="270" height="92" rx="12" fill="#191119" stroke="#ff2d55" stroke-opacity=".55"/>
+  <text x="360" y="138" font-size="14" font-weight="800" style="fill:#ff7a93">service worker</text>
+  <text x="360" y="158" font-size="10.5" class="muted">MV3 background · message router</text>
+  <text x="360" y="182" font-size="11" class="mono muted">msg → active provider</text></g>
+
+  <!-- providers -->
+  <g class="c2">
+  <rect x="700" y="98" width="220" height="66" rx="12" fill="#14130f" stroke="#e9e6df" stroke-opacity=".4"/>
+  <text x="720" y="123" font-size="13" font-weight="800">TIDAL</text>
+  <text x="720" y="142" font-size="10.5" class="muted">JSON:API · PKCE · tab login</text>
+  <text x="720" y="157" font-size="10" class="muted">searchSuggestions + directHits</text>
+
+  <rect x="700" y="172" width="220" height="66" rx="12" fill="#0f1a12" stroke="#1ed760" stroke-opacity=".5"/>
+  <text x="720" y="197" font-size="13" font-weight="800" style="fill:#5fe08a">Spotify</text>
+  <text x="720" y="216" font-size="10.5" class="muted">REST · PKCE · Premium write</text>
+  <text x="720" y="231" font-size="10" class="muted">create + add, de-duped</text>
+  </g>
+
+  <!-- shared / storage, below everything -->
+  <g class="c3"><rect x="40" y="252" width="880" height="50" rx="12" fill="#13181f" stroke="#2a3443"/>
+  <text x="60" y="275" font-size="12.5" font-weight="700" style="fill:#9fd6ff">shared/match.ts</text>
+  <text x="60" y="292" font-size="10.5" class="muted">title + artist + album scoring — picks the right track, or none</text>
+  <text x="900" y="275" text-anchor="end" font-size="12.5" font-weight="700" class="muted">chrome.storage.local</text>
+  <text x="900" y="292" text-anchor="end" font-size="10.5" class="muted">per-provider tokens + daily-playlist cache</text></g>
+
+  <text x="40" y="330" font-size="12" class="muted">Auth is Authorization Code + <tspan style="fill:#dcd6de">PKCE</tspan> — the only credential is a public client ID. No secret ships in the bundle.</text>
+  <text x="40" y="351" font-size="12" class="muted">Switch services anytime: each keeps its own login and daily playlists, no re-login, nothing to reset.</text>
+  <text x="40" y="372" font-size="11" class="muted">A pinned <tspan class="mono">key</tspan> in manifest.config.ts keeps the extension ID — and the OAuth redirect URI — constant across reloads.</text>
+</svg>
